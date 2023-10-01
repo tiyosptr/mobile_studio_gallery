@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_studio_gallery/login/login_page.dart';
-import 'package:mobile_studio_gallery/login/tampilan_registration2.dart';
-void main() {
-  runApp(MyApp());
-}
+import 'package:mobile_studio_gallery/login/tampilan_pendaftaran2.dart';
+void main() { runApp(Pendaftaran1());}
 
-class MyApp extends StatelessWidget {
+class Pendaftaran1 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(

@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:mobile_studio_gallery/login/tampilan_registration2.dart';
+import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
 
 void main() {
-  runApp(MyApp());
+  runApp(Pendaftaran3());
 }
 
-class MyApp extends StatelessWidget {
+class Pendaftaran3 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -50,7 +50,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                       Navigator.pop(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RegistrationPage2()));
+                              builder: (context) => RegistrationPage1()));
                     },
                   ),
                 ],
@@ -71,7 +71,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                       ),
                     ),
                     SizedBox(
-                      height: 50.0,
+                      height: 20.0,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -94,7 +94,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                           ),
                         ),
                         SizedBox(
-                          height: 10.0,
+                          height: 20.0,
                         ),
                         Container(
                           width: 356.0,
@@ -120,7 +120,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                           ),
                         ),
                         SizedBox(
-                          height: 15.0,
+                          height: 20.0,
                         ),
                         Container(
                           width: 356.0,
@@ -146,7 +146,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                           ),
                         ),
                         SizedBox(
-                          height: 20.0,
+                          height: 30.0,
                         ),
                         Text(
                           'No Rekening',
@@ -156,7 +156,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                           ),
                         ),
                         SizedBox(
-                          height: 10.0,
+                          height: 30.0,
                         ),
                         Container(
                           width: 356.0,
@@ -178,7 +178,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                           ),
                         ),
                         SizedBox(
-                          height: 10.0,
+                          height: 30.0,
                         ),
                         Text(
                           '*Untuk data bank tidak wajib diisi, tetapi ketika ingin melakukan booking wajib diisi.', // Teks di atas input
@@ -192,45 +192,39 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                   ],
                 ),
               ),
-              SizedBox(
-                height: 10.0,
+            ],
+          ),
+        ),
+      ),
+      bottomSheet: Container(
+        margin: EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
+        child: ElevatedButton(
+          onPressed: () {
+            // Tambahkan aksi yang ingin Anda lakukan saat tombol ditekan
+          },
+          style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(200.0),
               ),
-              Container(
-                margin: EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                            builder: (context) => RegistrationPage2()));
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.black),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(200.0),
-                      ),
-                    ),
-                  ),
-                  child: Container(
-                    height: 45.0,
-                    width: double.infinity,
-                    child: Center(
-                      child: Text(
-                        'Buat Akun',
-                        style: TextStyle(
-                          color: Colors.white,
-                        ),
-                      ),
-                    ),
-                  ),
+            ),
+          ),
+          child: Container(
+            height: 45.0,
+            width: double.infinity,
+            child: Center(
+              child: Text(
+                'Buat Akun',
+                style: TextStyle(
+                  color: Colors.white,
                 ),
               ),
-            ],
+            ),
           ),
         ),
       ),
     );
   }
 }
+
