@@ -29,7 +29,6 @@ class RegistrationPage2 extends StatefulWidget {
 class _RegistrationPageState extends State<RegistrationPage2> {
   bool _isPasswordVisible = false;
   bool _isConfirmPasswordVisible = false;
-  
 
   @override
   Widget build(BuildContext context) {
@@ -46,19 +45,23 @@ class _RegistrationPageState extends State<RegistrationPage2> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back_ios),
                       onPressed: () {
-                      Navigator.pop(
-                    context, MaterialPageRoute(builder: (context) => const RegistrationPage1()));
+                        Navigator.pop(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) =>
+                                    const RegistrationPage1()));
                       },
                     ),
                   ],
                 ),
-                
                 Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      const SizedBox(height: 5.0,),
+                      const SizedBox(
+                        height: 5.0,
+                      ),
                       const Text(
                         'Daftar',
                         style: TextStyle(
@@ -83,7 +86,7 @@ class _RegistrationPageState extends State<RegistrationPage2> {
                             height: 45.0,
                             child: TextField(
                               decoration: InputDecoration(
-                                    labelText: 'Masukkan Nama Pengguna',
+                                labelText: 'Masukkan Nama Pengguna',
                                 border: OutlineInputBorder(
                                   borderSide: BorderSide(),
                                 ),
@@ -109,7 +112,7 @@ class _RegistrationPageState extends State<RegistrationPage2> {
                             height: 45.0,
                             child: TextField(
                               decoration: InputDecoration(
-                                    labelText: 'Masukkan Kata Sandi',
+                                labelText: 'Masukkan Kata Sandi',
                                 border: const OutlineInputBorder(
                                   borderSide: BorderSide(),
                                 ),
@@ -160,7 +163,8 @@ class _RegistrationPageState extends State<RegistrationPage2> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _isConfirmPasswordVisible = !_isConfirmPasswordVisible;
+                                      _isConfirmPasswordVisible =
+                                          !_isConfirmPasswordVisible;
                                     });
                                   },
                                 ),
@@ -178,11 +182,31 @@ class _RegistrationPageState extends State<RegistrationPage2> {
           ),
           const SizedBox(height: 10.0),
           Container(
-            margin: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
+            margin:
+                const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => const RegistrationPage3()));
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return RegistrationPage3(); // Gantilah dengan halaman kedua yang ingin Anda tampilkan
+                    },
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin =
+                          Offset(7.0, 0.0); // Mulai dari kanan ke kiri
+                      const end = Offset.zero; // Berakhir di posisi awal
+                      const curve = Curves.easeOutCubic; // Kurva animasi
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child, // Halaman yang akan ditampilkan
+                      );
+                    },
+                  ),
+                );
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.black),

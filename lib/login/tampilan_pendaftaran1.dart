@@ -47,7 +47,7 @@ class _RegistrationPageState extends State<RegistrationPage1> {
                         Navigator.pop(
                             context,
                             MaterialPageRoute(
-                                builder: (context) => const LoginPage()));
+                                builder: (context) => LoginPage()));
                       },
                     ),
                   ],
@@ -131,10 +131,27 @@ class _RegistrationPageState extends State<RegistrationPage1> {
                 const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegistrationPage2()));
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return RegistrationPage2(); // Gantilah dengan halaman kedua yang ingin Anda tampilkan
+                    },
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin =
+                          Offset(7.0, 0.0); // Mulai dari kanan ke kiri
+                      const end = Offset.zero; // Berakhir di posisi awal
+                      const curve = Curves.easeOutCubic; // Kurva animasi
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child, // Halaman yang akan ditampilkan
+                      );
+                    },
+                  ),
+                );
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.black),

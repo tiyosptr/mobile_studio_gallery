@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'package:mobile_studio_gallery/login/tampilan_awal.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_sign_in/google_sign_in.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -48,18 +49,6 @@ class _LoginPageState extends State<LoginPage> {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
-  //fungsi logout start
-  Future<void> _logout() async {
-    try {
-      await FirebaseAuth.instance.signOut();
-      print("User berhasil logout"); // Pesan debug
-      await GoogleSignIn().signOut();
-    } catch (e) {
-      print("Gagal logout: $e"); // Pesan debug jika terjadi kesalahan
-    }
-  }
-  //fungsi logout end
-
   bool _isPasswordVisible = false;
 
   @override
@@ -75,19 +64,40 @@ class _LoginPageState extends State<LoginPage> {
                   mainAxisAlignment: MainAxisAlignment.start,
                   children: <Widget>[
                     IconButton(
-                      icon: const Icon(Icons.arrow_back_ios),
-                      onPressed: () {
-                        // Tambahkan logika untuk menangani tombol kembali di sini
-                        // Contoh: Navigator.of(context).pop();
-                      },
-                    ),
+                        icon: const Icon(Icons.arrow_back_ios),
+                        onPressed: () {
+                          Navigator.of(context).push(
+                            PageRouteBuilder(
+                              pageBuilder:
+                                  (context, animation, secondaryAnimation) {
+                                return Awal(); // Gantilah dengan halaman kedua yang ingin Anda tampilkan
+                              },
+                              transitionsBuilder: (context, animation,
+                                  secondaryAnimation, child) {
+                                const begin = Offset(
+                                    7.0, 0.0); // Mulai dari kanan ke kiri
+                                const end =
+                                    Offset.zero; // Berakhir di posisi awal
+                                const curve =
+                                    Curves.easeOutCubic; // Kurva animasi
+                                var tween = Tween(begin: begin, end: end)
+                                    .chain(CurveTween(curve: curve));
+                                var offsetAnimation = animation.drive(tween);
+                                return SlideTransition(
+                                  position: offsetAnimation,
+                                  child: child, // Halaman yang akan ditampilkan
+                                );
+                              },
+                            ),
+                          );
+                        })
                   ],
                 ),
                 Center(
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    mainAxisSize: MainAxisSize.min,
-                    children: <Widget>[
+                    child: Column(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        mainAxisSize: MainAxisSize.min,
+                        children: <Widget>[
                       const SizedBox(
                         height: 5.0,
                       ),
@@ -136,7 +146,8 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           const SizedBox(
-                              height: 30.0), // Tambahkan jarak di sini
+                            height: 30.0,
+                          ), // Tambahkan jarak di sini
                           SizedBox(
                             width: 356.0,
                             height: 45.0,
@@ -164,82 +175,60 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
+// Tambahkan jarak vertikal antara input Kata Sandi dan tombol "Sign In with Google"
 
-                      //sign in dengan google
                       Container(
-                        margin: const EdgeInsets.symmetric(
-                            horizontal: 25.0, vertical: 10.0),
-                        child: ElevatedButton(
-                          onPressed: () async {
-                            await GoogleSignIn().signOut();
-                            signInWithGoogle();
-                          },
-                          style: ButtonStyle(
-                            backgroundColor:
-                                MaterialStateProperty.all<Color>(Colors.red),
-                            shape: MaterialStateProperty.all<
-                                RoundedRectangleBorder>(
-                              RoundedRectangleBorder(
-                                borderRadius: BorderRadius.circular(200.0),
+                          margin: const EdgeInsets.symmetric(
+                              horizontal: 10.0, vertical: 30.0),
+                          child: ElevatedButton(
+                            onPressed: () {
+                              // Panggil fungsi signInWithGoogle ketika tombol diklik
+                              signInWithGoogle().then((userCredential) {
+                                // Di sini Anda dapat menambahkan logika apa yang harus dilakukan
+                                // setelah pengguna berhasil masuk dengan Google.
+                                // Misalnya, navigasi ke halaman beranda.
+                              }).catchError((error) {
+                                // Handle error jika ada kesalahan saat masuk dengan Google.
+                                print("Error signing in with Google: $error");
+                              });
+                            },
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white),
+                              shape: MaterialStateProperty.all<
+                                  RoundedRectangleBorder>(
+                                RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(200.0),
+                                ),
                               ),
                             ),
-                          ),
-                          child: const SizedBox(
-                            height: 45.0,
-                            width: double.infinity,
-                            child: Center(
-                              child: Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: [
-                                  Icon(
-                                    Icons
-                                        .g_translate, // Ganti dengan ikon yang sesuai
-                                    color: Colors.white,
-                                  ),
-                                  SizedBox(width: 10.0),
-                                  Text(
-                                    'Sign In with Google',
-                                    style: TextStyle(
-                                      color: Colors.white,
+                            child: SizedBox(
+                              height: 45.0,
+                              width: double.infinity,
+                              child: Center(
+                                child: Row(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Image.asset(
+                                      'images/google.jpg',
+                                      height: 24,
+                                      width: 24,
                                     ),
-                                  ),
-                                ],
+                                    SizedBox(width: 10.0),
+                                    Text(
+                                      'Sign In with Google',
+                                      style: TextStyle(
+                                        color: Colors.black,
+                                        fontSize: 15.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ),
-                      ), //signin dengan google
-                      //logout start
-                      ElevatedButton(
-                        onPressed: () async {
-                          await _logout(); // Panggil fungsi logout saat tombol keluar ditekan
-                        },
-                        style: ButtonStyle(
-                          backgroundColor:
-                              MaterialStateProperty.all<Color>(Colors.red),
-                          shape:
-                              MaterialStateProperty.all<RoundedRectangleBorder>(
-                            RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(200.0),
-                            ),
-                          ),
-                        ),
-                        child: const SizedBox(
-                          height: 45.0,
-                          width: double.infinity,
-                          child: Center(
-                            child: Text(
-                              'Logout',
-                              style: TextStyle(
-                                color: Colors.white,
-                              ),
-                            ),
-                          ),
-                        ),
-                      ), //logout end
-                    ],
-                  ),
-                ),
+                          ))
+                    ])),
               ],
             ),
           ),
@@ -249,10 +238,27 @@ class _LoginPageState extends State<LoginPage> {
                 horizontal: 25.0, vertical: 20.0), // Mengangkat tombol sedikit
             child: ElevatedButton(
               onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => const RegistrationPage1()));
+                Navigator.of(context).push(
+                  PageRouteBuilder(
+                    pageBuilder: (context, animation, secondaryAnimation) {
+                      return RegistrationPage1(); // Gantilah dengan halaman kedua yang ingin Anda tampilkan
+                    },
+                    transitionsBuilder:
+                        (context, animation, secondaryAnimation, child) {
+                      const begin =
+                          Offset(7.0, 0.0); // Mulai dari kanan ke kiri
+                      const end = Offset.zero; // Berakhir di posisi awal
+                      const curve = Curves.easeOutCubic; // Kurva animasi
+                      var tween = Tween(begin: begin, end: end)
+                          .chain(CurveTween(curve: curve));
+                      var offsetAnimation = animation.drive(tween);
+                      return SlideTransition(
+                        position: offsetAnimation,
+                        child: child, // Halaman yang akan ditampilkan
+                      );
+                    },
+                  ),
+                );
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
