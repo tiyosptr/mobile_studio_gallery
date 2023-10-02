@@ -48,6 +48,18 @@ class _LoginPageState extends State<LoginPage> {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
+  //fungsi logout start
+  Future<void> _logout() async {
+    try {
+      await FirebaseAuth.instance.signOut();
+      print("User berhasil logout"); // Pesan debug
+      await GoogleSignIn().signOut();
+    } catch (e) {
+      print("Gagal logout: $e"); // Pesan debug jika terjadi kesalahan
+    }
+  }
+  //fungsi logout end
+
   bool _isPasswordVisible = false;
 
   @override
@@ -158,7 +170,8 @@ class _LoginPageState extends State<LoginPage> {
                         margin: const EdgeInsets.symmetric(
                             horizontal: 25.0, vertical: 10.0),
                         child: ElevatedButton(
-                          onPressed: () {
+                          onPressed: () async {
+                            await GoogleSignIn().signOut();
                             signInWithGoogle();
                           },
                           style: ButtonStyle(
@@ -196,6 +209,34 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       ), //signin dengan google
+                      //logout start
+                      ElevatedButton(
+                        onPressed: () async {
+                          await _logout(); // Panggil fungsi logout saat tombol keluar ditekan
+                        },
+                        style: ButtonStyle(
+                          backgroundColor:
+                              MaterialStateProperty.all<Color>(Colors.red),
+                          shape:
+                              MaterialStateProperty.all<RoundedRectangleBorder>(
+                            RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(200.0),
+                            ),
+                          ),
+                        ),
+                        child: const SizedBox(
+                          height: 45.0,
+                          width: double.infinity,
+                          child: Center(
+                            child: Text(
+                              'Logout',
+                              style: TextStyle(
+                                color: Colors.white,
+                              ),
+                            ),
+                          ),
+                        ),
+                      ), //logout end
                     ],
                   ),
                 ),
