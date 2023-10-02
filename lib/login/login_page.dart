@@ -1,13 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
-
-void main() { runApp(MasukPage());}
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(const MasukPage());
+}
 
 class MasukPage extends StatelessWidget {
+  const MasukPage({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: LoginPage(),
       debugShowCheckedModeBanner: false,
     );
@@ -15,22 +23,41 @@ class MasukPage extends StatelessWidget {
 }
 
 class LoginPage extends StatefulWidget {
+  const LoginPage({super.key});
+
   @override
   _LoginPageState createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  Future<UserCredential> signInWithGoogle() async {
+    // Trigger the authentication flow
+    final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+
+    // Obtain the auth details from the request
+    final GoogleSignInAuthentication? googleAuth =
+        await googleUser?.authentication;
+
+    // Create a new credential
+    final credential = GoogleAuthProvider.credential(
+      accessToken: googleAuth?.accessToken,
+      idToken: googleAuth?.idToken,
+    );
+
+    // Once signed in, return the UserCredential
+    return await FirebaseAuth.instance.signInWithCredential(credential);
+  }
+
   bool _isPasswordVisible = false;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Column(
-
         children: <Widget>[
           Expanded(
             child: ListView(
-              padding: EdgeInsets.all(20.0),
+              padding: const EdgeInsets.all(20.0),
               children: <Widget>[
                 Row(
                   mainAxisAlignment: MainAxisAlignment.start,
@@ -49,16 +76,18 @@ class _LoginPageState extends State<LoginPage> {
                     mainAxisAlignment: MainAxisAlignment.center,
                     mainAxisSize: MainAxisSize.min,
                     children: <Widget>[
-                      SizedBox(height: 5.0,),
-                      Text(
+                      const SizedBox(
+                        height: 5.0,
+                      ),
+                      const Text(
                         'Masuk',
                         style: TextStyle(
                           fontSize: 30.0,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 50.0),
-                      Column(
+                      const SizedBox(height: 50.0),
+                      const Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
@@ -69,44 +98,41 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ),
                           SizedBox(height: 30.0), // Tambahkan jarak di sini
-                          Container(
+                          SizedBox(
                             width: 356.0,
                             height: 45.0,
-                            child:  TextField(
+                            child: TextField(
                               decoration: InputDecoration(
                                 labelText: 'Masukkan Nama Pengguna',
                                 border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                   
-                                  ),
+                                  borderSide: BorderSide(),
                                 ),
                               ),
                             ),
                           ),
                         ],
                       ),
-                      SizedBox(height: 30.0), // Tambahkan jarak di sini
+                      const SizedBox(height: 30.0), // Tambahkan jarak di sini
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
-                          Text(
+                          const Text(
                             'Kata Sandi',
                             style: TextStyle(
                               fontSize: 20.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
-                          SizedBox(height: 30.0), // Tambahkan jarak di sini
-                          Container(
+                          const SizedBox(
+                              height: 30.0), // Tambahkan jarak di sini
+                          SizedBox(
                             width: 356.0,
                             height: 45.0,
                             child: TextField(
                               decoration: InputDecoration(
                                 labelText: 'Masukkan Kata Sandi',
-                                border: OutlineInputBorder(
-                                  borderSide: BorderSide(
-                                
-                                  ),
+                                border: const OutlineInputBorder(
+                                  borderSide: BorderSide(),
                                 ),
                                 suffixIcon: IconButton(
                                   icon: Icon(
@@ -116,8 +142,7 @@ class _LoginPageState extends State<LoginPage> {
                                   ),
                                   onPressed: () {
                                     setState(() {
-                                      _isPasswordVisible =
-                                          !_isPasswordVisible;
+                                      _isPasswordVisible = !_isPasswordVisible;
                                     });
                                   },
                                 ),
@@ -127,29 +152,77 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
+
+                      //sign in dengan google
+                      Container(
+                        margin: const EdgeInsets.symmetric(
+                            horizontal: 25.0, vertical: 10.0),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            signInWithGoogle();
+                          },
+                          style: ButtonStyle(
+                            backgroundColor:
+                                MaterialStateProperty.all<Color>(Colors.red),
+                            shape: MaterialStateProperty.all<
+                                RoundedRectangleBorder>(
+                              RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(200.0),
+                              ),
+                            ),
+                          ),
+                          child: const SizedBox(
+                            height: 45.0,
+                            width: double.infinity,
+                            child: Center(
+                              child: Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: [
+                                  Icon(
+                                    Icons
+                                        .g_translate, // Ganti dengan ikon yang sesuai
+                                    color: Colors.white,
+                                  ),
+                                  SizedBox(width: 10.0),
+                                  Text(
+                                    'Sign In with Google',
+                                    style: TextStyle(
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        ),
+                      ), //signin dengan google
                     ],
                   ),
                 ),
               ],
             ),
           ),
-          SizedBox(height: 10.0),
+          const SizedBox(height: 10.0),
           Container(
-            margin: EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0), // Mengangkat tombol sedikit
+            margin: const EdgeInsets.symmetric(
+                horizontal: 25.0, vertical: 20.0), // Mengangkat tombol sedikit
             child: ElevatedButton(
               onPressed: () {
-                    Navigator.push(
-                    context, MaterialPageRoute(builder: (context) => RegistrationPage1()));
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => const RegistrationPage1()));
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
                 shape: MaterialStateProperty.all<RoundedRectangleBorder>(
                   RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(200.0), // Radius sudut 8
+                    borderRadius:
+                        BorderRadius.circular(200.0), // Radius sudut 8
                   ),
                 ),
               ),
-              child: Container(
+              child: const SizedBox(
                 height: 45.0,
                 width: double.infinity, // Menyusuaikan lebar layar
                 child: Center(

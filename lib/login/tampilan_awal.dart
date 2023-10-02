@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 
-void main() => runApp(Awal());
+void main() => runApp(const Awal());
 
 class Awal extends StatelessWidget {
+  const Awal({super.key});
+
 
 
   @override
@@ -48,8 +50,8 @@ class Awal extends StatelessWidget {
 
                 enableInfiniteScroll: true,
                 autoPlay: true,
-                autoPlayInterval: Duration(seconds: 4),
-                autoPlayAnimationDuration: Duration(milliseconds: 800),
+                autoPlayInterval: const Duration(seconds: 4),
+                autoPlayAnimationDuration: const Duration(milliseconds: 800),
                 autoPlayCurve: Curves.fastOutSlowIn,
               ),
             ),
@@ -73,7 +75,7 @@ class Awal extends StatelessWidget {
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Daftar/Masuk",
                         style: TextStyle(
                           fontSize: 17.0,
@@ -81,7 +83,7 @@ class Awal extends StatelessWidget {
                         ),
                       ),
                     ),
-                    SizedBox(width: 30.0), // Spasi antara tombol
+                    const SizedBox(width: 30.0), // Spasi antara tombol
                     ElevatedButton(
                       onPressed: () {
                         // Aksi yang diambil saat tombol "Masuk sebagai Tamu" ditekan
@@ -89,12 +91,12 @@ class Awal extends StatelessWidget {
                         // Tambahkan aksi sesuai kebutuhan Anda
                       },
                       style: ElevatedButton.styleFrom(
-                        primary: Colors.white.withOpacity(0.1),
+                        backgroundColor: Colors.white.withOpacity(0.1),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(20.0),
                         ),
                       ),
-                      child: Text(
+                      child: const Text(
                         "Masuk sebagai Tamu",
                         style: TextStyle(
                           fontSize: 17.0,
@@ -104,11 +106,11 @@ class Awal extends StatelessWidget {
                     ),
                   ],
                 ),
-                SizedBox(height: 15.0), // Spasi antara tombol dan teks
+                const SizedBox(height: 15.0), // Spasi antara tombol dan teks
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text(
+                    const Text(
                       "Belum punya akun? ",
                       style: TextStyle(
                         color: Colors.white,
@@ -122,7 +124,7 @@ class Awal extends StatelessWidget {
                         // Tambahkan aksi sesuai kebutuhan Anda
                         // Di sini Anda dapat menavigasi ke halaman pendaftaran atau melakukan aksi lainnya.
                       },
-                      child: Text(
+                      child: const Text(
                         "Daftar",
                         style: TextStyle(
                           color: Colors.blue,

@@ -3,13 +3,15 @@ import 'package:flutter/services.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
 
 void main() {
-  runApp(Pendaftaran3());
+  runApp(const Pendaftaran3());
 }
 
 class Pendaftaran3 extends StatelessWidget {
+  const Pendaftaran3({super.key});
+
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
+    return const MaterialApp(
       home: RegistrationPage3(),
       debugShowCheckedModeBanner: false,
     );
@@ -17,6 +19,8 @@ class Pendaftaran3 extends StatelessWidget {
 }
 
 class RegistrationPage3 extends StatefulWidget {
+  const RegistrationPage3({super.key});
+
   @override
   _RegistrationPageState createState() => _RegistrationPageState();
 }
@@ -38,19 +42,19 @@ class _RegistrationPageState extends State<RegistrationPage3> {
           constraints: BoxConstraints(
             maxHeight: MediaQuery.of(context).size.height,
           ),
-          padding: EdgeInsets.all(20.0),
+          padding: const EdgeInsets.all(20.0),
           child: Column(
             children: <Widget>[
               Row(
                 mainAxisAlignment: MainAxisAlignment.start,
                 children: <Widget>[
                   IconButton(
-                    icon: Icon(Icons.arrow_back_ios),
+                    icon: const Icon(Icons.arrow_back_ios),
                     onPressed: () {
                       Navigator.pop(
                           context,
                           MaterialPageRoute(
-                              builder: (context) => RegistrationPage1()));
+                              builder: (context) => const RegistrationPage1()));
                     },
                   ),
                 ],
@@ -60,43 +64,43 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   mainAxisSize: MainAxisSize.min,
                   children: <Widget>[
-                    SizedBox(
+                    const SizedBox(
                       height: 5.0,
                     ),
-                    Text(
+                    const Text(
                       'Daftar',
                       style: TextStyle(
                         fontSize: 30.0,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
-                    SizedBox(
+                    const SizedBox(
                       height: 20.0,
                     ),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: <Widget>[
-                        Text(
+                        const Text(
                           'Isi Data Bank', // Teks di atas input
                           style: TextStyle(
                             fontSize: 22.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20.0,
                         ),
-                        Text(
+                        const Text(
                           'Nama Lengkap',
                           style: TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20.0,
                         ),
-                        Container(
+                        const SizedBox(
                           width: 356.0,
                           height: 45.0,
                           child: TextField(
@@ -109,23 +113,23 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20.0,
                         ),
-                        Text(
+                        const Text(
                           'Bank',
                           style: TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 20.0,
                         ),
                         Container(
                           width: 356.0,
                           height: 45.0,
-                          padding: EdgeInsets.symmetric(horizontal: 5.0),
+                          padding: const EdgeInsets.symmetric(horizontal: 5.0),
                           decoration: BoxDecoration(
                             border: Border.all(),
                           ),
@@ -145,20 +149,20 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                             },
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 30.0,
                         ),
-                        Text(
+                        const Text(
                           'No Rekening',
                           style: TextStyle(
                             fontSize: 18.0,
                             fontWeight: FontWeight.bold,
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 30.0,
                         ),
-                        Container(
+                        SizedBox(
                           width: 356.0,
                           height: 45.0,
                           child: TextField(
@@ -168,7 +172,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                               FilteringTextInputFormatter
                                   .digitsOnly, // Hanya memperbolehkan angka
                             ],
-                            decoration: InputDecoration(
+                            decoration: const InputDecoration(
                               labelText:
                                   'Masukkan No Rekening', // Teks di dalam border
                               border: OutlineInputBorder(
@@ -177,10 +181,10 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                             ),
                           ),
                         ),
-                        SizedBox(
+                        const SizedBox(
                           height: 30.0,
                         ),
-                        Text(
+                        const Text(
                           '*Untuk data bank tidak wajib diisi, tetapi ketika ingin melakukan booking wajib diisi.', // Teks di atas input
                           style: TextStyle(
                             fontSize: 13.0,
@@ -197,7 +201,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
         ),
       ),
       bottomSheet: Container(
-        margin: EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
+        margin: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
         child: ElevatedButton(
           onPressed: () {
             // Tambahkan aksi yang ingin Anda lakukan saat tombol ditekan
@@ -210,7 +214,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
               ),
             ),
           ),
-          child: Container(
+          child: const SizedBox(
             height: 45.0,
             width: double.infinity,
             child: Center(
