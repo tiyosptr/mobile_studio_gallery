@@ -2,8 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobile_studio_gallery/login/tampilan_awal.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
+import 'package:mobile_studio_gallery/utils/showSnackbar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+
+GoogleSignIn _googleSignIn = GoogleSignIn(scopes: <String>[
+  'email',
+  'https://www.googleapis.com/auth/contacs.readonly'
+]);
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,10 +33,59 @@ class LoginPage extends StatefulWidget {
   const LoginPage({super.key});
 
   @override
-  _LoginPageState createState() => _LoginPageState();
+  State<LoginPage> createState() => _LoginPageState();
 }
 
 class _LoginPageState extends State<LoginPage> {
+  late GoogleSignInAccount currentUser;
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+
+  final FirebaseAuth _auth = FirebaseAuth.instance;
+  //signUplogic start
+  Future<void> signUp() async {
+    final auth = FirebaseAuth.instance;
+    auth.createUserWithEmailAndPassword(
+      email: _emailController.text,
+      password: _passwordController.text,
+    );
+  }
+  //signUplogic eend
+
+  Future<void> signInWithEmailAndPassword() async {
+    if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
+      // Jika email atau kata sandi kosong, tampilkan pesan kesalahan.
+      setState(() {
+        _showError = true; // Menampilkan pesan kesalahan.
+      });
+      return;
+    }
+
+    try {
+      final userCredential = await _auth.signInWithEmailAndPassword(
+        email: _emailController.text,
+        password: _passwordController.text,
+      );
+
+      if (userCredential.user != null) {
+        // Jika berhasil login, Anda dapat mengarahkan pengguna ke halaman berikutnya atau melakukan tindakan lainnya.
+        print('User berhasil login');
+        showSnackBar(context, "Login berhasil");
+      } else {
+        // Jika userCredential.user null, maka login gagal.
+        setState(() {
+          _showError = true; // Menampilkan pesan kesalahan.
+        });
+      }
+    } on FirebaseAuthException catch (e) {
+      setState(() {
+        _showError = true; // Menampilkan pesan kesalahan.
+      });
+      print(e.message);
+      // Handle error, misalnya menampilkan pesan kesalahan kepada pengguna.
+    }
+  }
+
   Future<UserCredential> signInWithGoogle() async {
     // Trigger the authentication flow
     final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
@@ -49,10 +104,18 @@ class _LoginPageState extends State<LoginPage> {
     return await FirebaseAuth.instance.signInWithCredential(credential);
   }
 
+  Future<void> signOutFromGoogle() async {
+    await _googleSignIn.signOut();
+    await _auth.signOut();
+  }
+
+  bool _showError = false;
   bool _isPasswordVisible = false;
+  String _loginStatusMessage = '';
 
   @override
   Widget build(BuildContext context) {
+    User? result = FirebaseAuth.instance.currentUser;
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -109,7 +172,7 @@ class _LoginPageState extends State<LoginPage> {
                         ),
                       ),
                       const SizedBox(height: 50.0),
-                      const Column(
+                      Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: <Widget>[
                           Text(
@@ -124,6 +187,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: 356.0,
                             height: 45.0,
                             child: TextField(
+                              controller: _emailController,
                               decoration: InputDecoration(
                                 labelText: 'Masukkan Nama Pengguna',
                                 border: OutlineInputBorder(
@@ -152,6 +216,7 @@ class _LoginPageState extends State<LoginPage> {
                             width: 356.0,
                             height: 45.0,
                             child: TextField(
+                              controller: _passwordController,
                               decoration: InputDecoration(
                                 labelText: 'Masukkan Kata Sandi',
                                 border: const OutlineInputBorder(
@@ -175,22 +240,22 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ],
                       ),
-// Tambahkan jarak vertikal antara input Kata Sandi dan tombol "Sign In with Google"
-
+                      // Tambahkan jarak vertikal antara input Kata Sandi dan tombol "Sign In with Google"
+                      // Pesan error jika user salah dalam melakukan input data start
+                      if (_showError)
+                        const Text(
+                          'Email dan kata sandi harus diisi atau salah.',
+                          style: TextStyle(
+                            color: Colors.red, // Warna teks kesalahan.
+                          ),
+                        ),
+                      // Pesan error jika user salah dalam melakukan input data start end
                       Container(
                           margin: const EdgeInsets.symmetric(
                               horizontal: 10.0, vertical: 30.0),
                           child: ElevatedButton(
-                            onPressed: () {
-                              // Panggil fungsi signInWithGoogle ketika tombol diklik
-                              signInWithGoogle().then((userCredential) {
-                                // Di sini Anda dapat menambahkan logika apa yang harus dilakukan
-                                // setelah pengguna berhasil masuk dengan Google.
-                                // Misalnya, navigasi ke halaman beranda.
-                              }).catchError((error) {
-                                // Handle error jika ada kesalahan saat masuk dengan Google.
-                                print("Error signing in with Google: $error");
-                              });
+                            onPressed: () async {
+                              await signInWithGoogle();
                             },
                             style: ButtonStyle(
                               backgroundColor: MaterialStateProperty.all<Color>(
@@ -229,6 +294,34 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ))
                     ])),
+                // logout start
+                ElevatedButton(
+                  onPressed: () async {
+                    await signOutFromGoogle();
+                    // Panggil fungsi logout saat tombol keluar ditekan
+                  },
+                  style: ButtonStyle(
+                    backgroundColor:
+                        MaterialStateProperty.all<Color>(Colors.red),
+                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                      RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(200.0),
+                      ),
+                    ),
+                  ),
+                  child: const SizedBox(
+                    height: 45.0,
+                    width: double.infinity,
+                    child: Center(
+                      child: Text(
+                        'Logout',
+                        style: TextStyle(
+                          color: Colors.white,
+                        ),
+                      ),
+                    ),
+                  ),
+                ), //logout end
               ],
             ),
           ),
@@ -237,7 +330,8 @@ class _LoginPageState extends State<LoginPage> {
             margin: const EdgeInsets.symmetric(
                 horizontal: 25.0, vertical: 20.0), // Mengangkat tombol sedikit
             child: ElevatedButton(
-              onPressed: () {
+              onPressed: () async {
+                await signInWithEmailAndPassword();
                 Navigator.of(context).push(
                   PageRouteBuilder(
                     pageBuilder: (context, animation, secondaryAnimation) {

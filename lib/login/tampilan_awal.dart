@@ -2,8 +2,13 @@ import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mobile_studio_gallery/login/login_page.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
+import 'package:firebase_core/firebase_core.dart';
 
-void main() => runApp(DaftarAwal());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(DaftarAwal());
+}
 
 class DaftarAwal extends StatelessWidget {
   @override
