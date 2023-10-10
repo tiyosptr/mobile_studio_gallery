@@ -15,6 +15,7 @@ class DaftarAwal extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Awal(),
+      debugShowCheckedModeBanner: false,
     );
   }
 }
