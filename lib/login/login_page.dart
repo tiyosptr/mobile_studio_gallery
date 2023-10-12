@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobile_studio_gallery/login/tampilan_awal.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
+import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 import 'package:mobile_studio_gallery/utils/showSnackbar.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -56,7 +57,7 @@ class _LoginPageState extends State<LoginPage> {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       // Jika email atau kata sandi kosong, tampilkan pesan kesalahan.
       setState(() {
-        _showError = true; // Menampilkan pesan kesalahan.
+        _showError = true;
       });
       return;
     }
@@ -71,18 +72,27 @@ class _LoginPageState extends State<LoginPage> {
         // Jika berhasil login, Anda dapat mengarahkan pengguna ke halaman berikutnya atau melakukan tindakan lainnya.
         print('User berhasil login');
         showSnackBar(context, "Login berhasil");
+        // Arahkan pengguna ke halaman utama.
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(
+            builder: (context) => HomePage(),
+          ),
+        );
+        // Membersihkan pesan kesalahan jika ada.
+        setState(() {
+          _showError = false;
+        });
       } else {
         // Jika userCredential.user null, maka login gagal.
         setState(() {
-          _showError = true; // Menampilkan pesan kesalahan.
+          _showError = true;
         });
       }
     } on FirebaseAuthException catch (e) {
       setState(() {
-        _showError = true; // Menampilkan pesan kesalahan.
+        _showError = true;
       });
       print(e.message);
-      // Handle error, misalnya menampilkan pesan kesalahan kepada pengguna.
     }
   }
 
@@ -111,11 +121,9 @@ class _LoginPageState extends State<LoginPage> {
 
   bool _showError = false;
   bool _isPasswordVisible = false;
-  String _loginStatusMessage = '';
 
   @override
   Widget build(BuildContext context) {
-    User? result = FirebaseAuth.instance.currentUser;
     return Scaffold(
       body: Column(
         children: <Widget>[
@@ -332,27 +340,6 @@ class _LoginPageState extends State<LoginPage> {
             child: ElevatedButton(
               onPressed: () async {
                 await signInWithEmailAndPassword();
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                      return RegistrationPage1(); // Gantilah dengan halaman kedua yang ingin Anda tampilkan
-                    },
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin =
-                          Offset(7.0, 0.0); // Mulai dari kanan ke kiri
-                      const end = Offset.zero; // Berakhir di posisi awal
-                      const curve = Curves.easeOutCubic; // Kurva animasi
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child, // Halaman yang akan ditampilkan
-                      );
-                    },
-                  ),
-                );
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.black),

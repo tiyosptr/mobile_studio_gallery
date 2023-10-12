@@ -1,8 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
+import 'package:firebase_core/firebase_core.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
-void main() => runApp(PaketApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await Firebase.initializeApp();
+  runApp(PaketApp());
+}
 
 class PaketApp extends StatelessWidget {
   @override
@@ -29,6 +36,8 @@ class _HomePageState extends State<HomePage> {
     'images/graduation.jpg',
     'images/withfriends.jpg',
   ];
+
+  // Function to fetch the username from Firestore
 
   final List<String> months = [
     'MARCH',
@@ -150,7 +159,7 @@ class _HomePageState extends State<HomePage> {
                 top: 60.0,
                 left: 20.0,
                 child: Text(
-                  'Joni',
+                  'joni',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 18.0,
@@ -269,4 +278,3 @@ class _HomePageState extends State<HomePage> {
     );
   }
 }
-

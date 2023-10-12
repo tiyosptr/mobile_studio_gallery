@@ -37,7 +37,7 @@ dependencies:
     sdk: flutter
   google_sign_in: ^6.1.5
   image_picker: ^1.0.4
-  provider: ^6.0.5
+
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -60,6 +60,15 @@ flutter:
     - images/image 2.png
     - images/image 3.png
     - images/google.jpg
+    - images/family.jpg
+    - images/prewedding.jpg
+    - images/graduation.jpg
+    - images/withfriends.jpg
+    - images/studio1.png
+    - images/studio2.png
+    - images/studio3.png
+    - images/studio4.png
+
     # - images/foto.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware
