@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:mobile_studio_gallery/login/tampilan_awal.dart';
-import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
+import 'package:mobile_studio_gallery/login/tampilan_pendaftaran2.dart';
 import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 import 'package:mobile_studio_gallery/utils/showSnackbar.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -302,6 +302,54 @@ class _LoginPageState extends State<LoginPage> {
                             ),
                           ))
                     ])),
+                     Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  SizedBox(height: 50.0), // Tambahkan spasi di sini
+                  Text(
+                    "Belum punya akun? ",
+                    style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15.0,
+                    ),
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return RegistrationPage2(); // Gantilah dengan halaman yang ingin Anda tampilkan saat daftar
+                          },
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(7.0, 0.0); // Mulai dari kanan ke kiri
+                            const end = Offset.zero; // Berakhir di posisi awal
+                            const curve = Curves.easeOutCubic; // Kurva animasi
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child:
+                                  child, // Halaman yang akan ditampilkan saat daftar
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Text(
+                      "Daftar",
+                      style: TextStyle(
+                        color: Colors.blue,
+                        fontSize: 15.0,
+                        decoration: TextDecoration.underline,
+                      ),
+                    ),
+                  )
+                ],
+              ),
                 // logout start
                 ElevatedButton(
                   onPressed: () async {

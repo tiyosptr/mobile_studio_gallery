@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mobile_studio_gallery/menu/bar.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -38,13 +40,6 @@ class _HomePageState extends State<HomePage> {
   ];
 
   // Function to fetch the username from Firestore
-
-  final List<String> months = [
-    'MARCH',
-    'APRIL',
-    'MEI',
-    'JUNE',
-  ];
 
   final List<Map<String, dynamic>> paketList = [
     {
@@ -108,7 +103,7 @@ class _HomePageState extends State<HomePage> {
                 }).toList(),
                 options: CarouselOptions(
                   autoPlay: true,
-                  height: 350.0,
+                  height: 400.0,
                   viewportFraction: 1,
                   disableCenter: true,
                   autoPlayInterval: Duration(seconds: 4),
@@ -121,62 +116,23 @@ class _HomePageState extends State<HomePage> {
                 ),
               ),
               Positioned(
-                top: 70,
-                child: Column(
-                  children: [
-                    Text(
-                      'MONTHLY',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    Text(
-                      'HIGHLIGHTS',
-                      style: TextStyle(
-                        color: Colors.white,
-                        fontSize: 24.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              Positioned(
-                top: 20.0,
+                top: 50.0,
                 left: 20.0,
                 child: Text(
                   'Selamat Datang',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 24.0,
-                    fontWeight: FontWeight.bold,
-                  ),
+                  style: GoogleFonts.poppins(
+                      textStyle:
+                          TextStyle(color: Colors.white, fontSize: 20.0)),
                 ),
               ),
               Positioned(
-                top: 60.0,
+                top: 80.0,
                 left: 20.0,
                 child: Text(
                   'joni',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                  ),
-                ),
-              ),
-              Positioned(
-                bottom: 100,
-                child: Align(
-                  child: Text(
-                    months[_currentImageIndex],
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 24.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
+                  style: GoogleFonts.poppins(
+                      textStyle:
+                          TextStyle(color: Colors.white, fontSize: 20.0)),
                 ),
               ),
             ],
@@ -184,13 +140,9 @@ class _HomePageState extends State<HomePage> {
           SizedBox(height: 20),
           Text(
             'Paket Kami',
-            style: TextStyle(
-              color: Colors.white,
-              fontSize: 20.0,
-              fontWeight: FontWeight.bold,
-            ),
+            style: GoogleFonts.roboto(
+                textStyle: TextStyle(color: Colors.white, fontSize: 20.0)),
           ),
-          SizedBox(height: 20),
           Expanded(
             child: ListView.builder(
               itemCount: paketList.length,
@@ -209,25 +161,26 @@ class _HomePageState extends State<HomePage> {
                         fit: BoxFit.cover,
                       ),
                     ),
-                    title: Text(
-                      paket['title'],
-                      style: TextStyle(
-                        color: Colors.white,
-                      ),
-                    ),
+                    title: Text(paket['title'],
+                        style: GoogleFonts.roboto(
+                          textStyle:
+                              TextStyle(color: Colors.white, fontSize: 20.0),
+                        )),
                     subtitle: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           paket['description'],
-                          style: TextStyle(
-                            color: Colors.white,
+                          style: GoogleFonts.roboto(
+                            textStyle:
+                                TextStyle(color: Colors.white, fontSize: 10.0),
                           ),
                         ),
                         Text(
                           paket['additionalText'],
-                          style: TextStyle(
-                            color: Colors.white,
+                          style: GoogleFonts.roboto(
+                            textStyle:
+                                TextStyle(color: Colors.white, fontSize: 10.0),
                           ),
                         ),
                       ],
@@ -246,8 +199,9 @@ class _HomePageState extends State<HomePage> {
                       ),
                       child: Text(
                         'Rp ${paket['price']}',
-                        style: TextStyle(
-                          color: Colors.white,
+                        style: GoogleFonts.roboto(
+                          textStyle:
+                              TextStyle(color: Colors.white, fontSize: 14.0),
                         ),
                       ),
                     ),
@@ -258,23 +212,8 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
-      bottomNavigationBar: BottomNavigationBar(
-        backgroundColor: Colors.black,
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home, color: Colors.white),
-            label: '_____',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.shop, color: Colors.white),
-            label: '_____',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person, color: Colors.white),
-            label: '_____',
-          ),
-        ],
-      ),
+      bottomNavigationBar:
+          BottomNavigation(), // Use the BottomNavigation widget here
     );
   }
 }
