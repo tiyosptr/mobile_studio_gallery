@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 final List<String> studioImages = [
   'images/studio1.png',
   'images/studio2.png',
@@ -8,19 +9,20 @@ final List<String> studioImages = [
 ];
 
 class DetailHargaPage extends StatefulWidget {
-  final Map<String, dynamic> paket;
-
-  DetailHargaPage({required this.paket});
-
   @override
   _DetailHargaPageState createState() => _DetailHargaPageState();
 }
 
 class _DetailHargaPageState extends State<DetailHargaPage> {
-  int _selectedStudioIndex = 0;
+  int _selectedStudioIndex = 0; // Tambahan: inisialisasi indeks studio terpilih
 
   @override
   Widget build(BuildContext context) {
+    // Mendapatkan argumen yang dikirim dari rute sebelumnya
+    final Map<String, dynamic> paket =
+        ModalRoute.of(context)!.settings.arguments as Map<String, dynamic>;
+    String imagePath = paket['imagePath'] as String;
+
     return Scaffold(
       backgroundColor: Color(0xFF101720),
       body: Stack(
@@ -33,7 +35,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
               alignment: Alignment.centerLeft,
               children: [
                 Image.asset(
-                  widget.paket['imagePath'],
+                  imagePath,
                   fit: BoxFit.cover,
                   height: 400.0,
                   width: 400.0,
@@ -72,7 +74,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                     children: <Widget>[
                       SizedBox(height: 10),
                       Text(
-                        widget.paket['title'],
+                        paket['title'],
                         style: TextStyle(
                           color: Colors.white,
                           fontSize: 24.0,
@@ -88,10 +90,10 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           ),
                           SizedBox(width: 10),
                           Text(
-                            widget.paket['description'],
-                           style: GoogleFonts.roboto(
-                          textStyle:
-                              TextStyle(color: Colors.white, fontSize: 20.0),
+                            paket['description'],
+                            style: GoogleFonts.roboto(
+                              textStyle: TextStyle(
+                                  color: Colors.white, fontSize: 20.0),
                             ),
                           ),
                         ],
@@ -106,10 +108,9 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           SizedBox(width: 10),
                           Text(
                             '30 Menit',
-                                style: GoogleFonts.roboto(
-                          textStyle:
-                              TextStyle(color: Colors.white, fontSize: 20.0),
-                   
+                            style: GoogleFonts.roboto(
+                              textStyle: TextStyle(
+                                  color: Colors.white, fontSize: 20.0),
                             ),
                           ),
                         ],
@@ -124,10 +125,9 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           SizedBox(width: 10),
                           Text(
                             '2x Ganti Pakaian',
-                         style: GoogleFonts.roboto(
-                          textStyle:
-                              TextStyle(color: Colors.white, fontSize: 20.0),
-                         
+                            style: GoogleFonts.roboto(
+                              textStyle: TextStyle(
+                                  color: Colors.white, fontSize: 20.0),
                             ),
                           ),
                         ],
@@ -150,9 +150,9 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           SizedBox(width: 10),
                           Text(
                             'Semua Data Foto',
-                           style: GoogleFonts.roboto(
-                          textStyle:
-                              TextStyle(color: Colors.white, fontSize: 20.0),
+                            style: GoogleFonts.roboto(
+                              textStyle: TextStyle(
+                                  color: Colors.white, fontSize: 20.0),
                             ),
                           ),
                         ],
@@ -167,9 +167,9 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           SizedBox(width: 10),
                           Text(
                             '1 pcs 10R & Bingkai',
-                              style: GoogleFonts.roboto(
-                          textStyle:
-                              TextStyle(color: Colors.white, fontSize: 20.0),
+                            style: GoogleFonts.roboto(
+                              textStyle: TextStyle(
+                                  color: Colors.white, fontSize: 20.0),
                             ),
                           ),
                         ],
@@ -215,11 +215,13 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           );
                         }).toList(),
                       ),
-                      Text('Studio Terpilih: ${_selectedStudioIndex + 1}',
-                          style: TextStyle(
-                            color: Colors.white,
-                            fontSize: 16.0,
-                          ))
+                      Text(
+                        'Studio Terpilih: ${_selectedStudioIndex + 1}',
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontSize: 16.0,
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -229,7 +231,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
         ],
       ),
       bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 30),
+        padding: EdgeInsets.symmetric(horizontal: 20),
         child: ElevatedButton(
           onPressed: () {
             // Tambahkan logika pemesanan di sini
@@ -237,11 +239,11 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF445256),
             shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(20.0),
+              borderRadius: BorderRadius.circular(5.0),
             ),
           ),
           child: Padding(
-            padding: EdgeInsets.all(5.0),
+            padding: EdgeInsets.all(10.0),
             child: Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
