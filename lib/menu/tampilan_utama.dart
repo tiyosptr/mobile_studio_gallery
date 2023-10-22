@@ -22,7 +22,7 @@ class PaketApp extends StatelessWidget {
       initialRoute: '/',
       routes: {
         '/': (context) => HomePage(),
-        '/detailharga': (context) => DetailHargaPage(),
+        // '/detailharga': (context) => DetailHargaPage(),
         '/detailhargapage': (context) =>
             DetailHargaPage(), // Tambahkan rute ini
       },
@@ -48,11 +48,11 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black,
-      body: ListView(
-        children: [
+        backgroundColor: Colors.black,
+        bottomNavigationBar: BottomNavigation(),
+        body: ListView(children: [
           Stack(
-            alignment: Alignment.topCenter,
+            // alignment: Alignment.topCenter,
             children: [
               CarouselSlider(
                 items: imagePaths.map((imagePath) {
@@ -63,11 +63,11 @@ class _HomePageState extends State<HomePage> {
                 }).toList(),
                 options: CarouselOptions(
                   autoPlay: true,
-                  height: 350.0,
+                  height: 350,
                   viewportFraction: 1,
                   disableCenter: true,
                   autoPlayInterval: Duration(seconds: 4),
-                  autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  // autoPlayAnimationDuration: Duration(milliseconds: 800),
                   onPageChanged: (index, reason) {
                     setState(() {
                       _currentImageIndex = index;
@@ -92,8 +92,10 @@ class _HomePageState extends State<HomePage> {
                 child: Text(
                   'Selamat Datang',
                   style: GoogleFonts.poppins(
-                      textStyle:
-                          TextStyle(color: Colors.white, fontSize: 20.0)),
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          fontWeight: FontWeight.bold)),
                 ),
               ),
               Positioned(
@@ -114,58 +116,59 @@ class _HomePageState extends State<HomePage> {
             style: GoogleFonts.roboto(
                 textStyle: TextStyle(color: Colors.white, fontSize: 20.0)),
           ),
-          Expanded(
-            child: Column(
-              children: [
-                CardWidget(
-                  cardWidth: 400.0,
-                  imageWidth: 110.0,
-                  cardHeight: 120.0,
-                  imagePath: 'images/family.jpg',
-                  title: 'Paket Keluarga',
-                  description: '2-10 Orang',
-                  additionalText: 'Dapat 1pcs 10R print foto dan bingkai',
-                  harga: '200.000',
-                ),
-                CardWidget(
-                  cardWidth: 400.0,
-                  imageWidth: 110.0,
-                  cardHeight: 120.0,
-                  imagePath: 'images/prewedding.jpg',
-                  title: 'Paket Prewedding',
-                  description: '1-5 Orang',
-                  additionalText: 'Dapat 2 pcs 10R print foto dan bingkai',
-                  harga: '150.000',
-                ),
-                CardWidget(
-                  cardWidth: 400.0,
-                  imageWidth: 110.0,
-                  cardHeight: 120.0,
-                  imagePath: 'images/graduation.jpg',
-                  title: 'Paket Graduation',
-                  description: '1 Orang',
-                  additionalText: 'Dapat 1 pcs 8R print foto',
-                  harga: '100.000',
-                ),
-                CardWidget(
-                  cardWidth: 400.0,
-                  imageWidth: 110.0,
-                  cardHeight: 120.0,
-                  imagePath: 'images/withfriends.jpg',
-                  title: 'Paket Bersama Teman',
-                  description: '2-8 Orang',
-                  additionalText: 'Dapat 5 pcs 5R print foto',
-                  harga: '250.000',
-                ),
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  children: [
+                    CardWidget(
+                      cardWidth: 400,
+                      imageWidth: 110.0,
+                      cardHeight: 120.0,
+                      imagePath: 'images/family.jpg',
+                      title: 'Paket Keluarga',
+                      description: '2-10 Orang',
+                      additionalText: 'Dapat 1pcs 10R print foto dan bingkai',
+                      harga: '200.000',
+                    ),
+                    CardWidget(
+                      cardWidth: 400,
+                      imageWidth: 110.0,
+                      cardHeight: 120.0,
+                      imagePath: 'images/prewedding.jpg',
+                      title: 'Paket PraNikah',
+                      description: '1-5 Orang',
+                      additionalText: 'Dapat 2 pcs 10R print foto dan bingkai',
+                      harga: '150.000',
+                    ),
+                    CardWidget(
+                      cardWidth: 400,
+                      imageWidth: 110.0,
+                      cardHeight: 120.0,
+                      imagePath: 'images/graduation.jpg',
+                      title: 'Paket Kelulusan',
+                      description: '1 Orang',
+                      additionalText: 'Dapat 1 pcs 8R print foto',
+                      harga: '100.000',
+                    ),
+                    CardWidget(
+                      cardWidth: 400.0,
+                      imageWidth: 110.0,
+                      cardHeight: 120.0,
+                      imagePath: 'images/withfriends.jpg',
+                      title: 'Paket Bersama Teman',
+                      description: '2-8 Orang',
+                      additionalText: 'Dapat 5 pcs 5R print foto',
+                      harga: '250.000',
+                    ),
 
-                // Tambahkan CardWidget lainnya di sini
-              ],
-            ),
+                    // Tambahkan CardWidget lainnya di sini
+                  ],
+                ),
+              ),
+            ],
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigation(),
-    );
+        ]));
   }
 }
 

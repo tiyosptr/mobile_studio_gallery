@@ -70,6 +70,7 @@ flutter:
     - images/studio2.png
     - images/studio3.png
     - images/studio4.png
+    - images/alip.png
 
     # - images/foto.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see

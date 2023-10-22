@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
+import 'package:mobile_studio_gallery/menu/memilih_jadwal.dart';
 final List<String> studioImages = [
   'images/studio1.png',
   'images/studio2.png',
@@ -24,7 +24,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
     String imagePath = paket['imagePath'] as String;
 
     return Scaffold(
-      backgroundColor: Color(0xFF101720),
+      backgroundColor: Color(0xFF101716),
       body: Stack(
         children: [
           Positioned(
@@ -36,9 +36,9 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
               children: [
                 Image.asset(
                   imagePath,
-                  fit: BoxFit.cover,
+                fit: BoxFit.cover,
                   height: 400.0,
-                  width: 400.0,
+                  width: 420.0,
                 ),
                 Positioned(
                   top: 30, // Atur posisi vertikal
@@ -61,7 +61,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
             child: Container(
               padding: EdgeInsets.all(16),
               decoration: BoxDecoration(
-                color: Color(0xFF101720),
+                color: Color(0xFF101716),
                 borderRadius: BorderRadius.vertical(
                   top: Radius.circular(40.0),
                 ),
@@ -234,8 +234,13 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: ElevatedButton(
           onPressed: () {
-            // Tambahkan logika pemesanan di sini
-          },
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => JadwalApp(),
+      ),
+    );
+  },
           style: ElevatedButton.styleFrom(
             primary: Color(0xFF445256),
             shape: RoundedRectangleBorder(
