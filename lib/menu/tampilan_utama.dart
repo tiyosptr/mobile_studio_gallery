@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
 import 'package:firebase_core/firebase_core.dart';
-import 'package:mobile_studio_gallery/menu/bar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_studio_gallery/menu/bar.dart';
+import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
+//firebase storage ada 10 file
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -19,24 +20,23 @@ class PaketApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(),
-      initialRoute: '/',
-      routes: {
-        '/': (context) => HomePage(),
-        // '/detailharga': (context) => DetailHargaPage(),
-        '/detailhargapage': (context) =>
-            DetailHargaPage(), // Tambahkan rute ini
-      },
+      home: HomePage(),
     );
   }
 }
 
 class HomePage extends StatefulWidget {
+  const HomePage({Key? key}) : super(key: key);
+
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
   int _currentImageIndex = 0;
+  late User _currentUser;
+  List<DocumentSnapshot>? _paketData;
+  bool _isLoading = true; // Menyimpan data yang telah diambil
 
   final List<String> imagePaths = [
     'images/family.jpg',
@@ -46,32 +46,73 @@ class _HomePageState extends State<HomePage> {
   ];
 
   @override
+  void initState() {
+    super.initState();
+    // Check if a user is authenticated
+    if (FirebaseAuth.instance.currentUser != null) {
+      _currentUser = FirebaseAuth.instance.currentUser!;
+    } else {
+      // Handle the case where the user is not authenticated
+      // You can display a login screen or handle it as needed
+    }
+  }
+
+  void _navigateToDetailPage(Map<String, dynamic> paket) {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => DetailHargaPage(paket: paket),
+      ),
+    );
+  }
+
+  Future<void> _fetchPaketData() async {
+    try {
+      final querySnapshot =
+          await FirebaseFirestore.instance.collection('Paket').get();
+      setState(() {
+        _paketData = querySnapshot.docs;
+        _isLoading = false; // Simpan data yang telah diambil
+      });
+    } catch (e) {
+      print('Error fetching data: $e');
+      setState(() {
+        _isLoading =
+            false; // Nonaktifkan indikator loading dalam kasus kesalahan
+      });
+    }
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: Colors.black,
-        bottomNavigationBar: BottomNavigation(),
-        body: ListView(children: [
+      backgroundColor: Colors.white,
+      body: ListView(
+        children: [
           Stack(
-            // alignment: Alignment.topCenter,
+            alignment: Alignment.topCenter,
             children: [
               CarouselSlider(
                 items: imagePaths.map((imagePath) {
                   return Image.asset(
                     imagePath,
                     fit: BoxFit.cover,
+                    width: 430,
+                    height: 496,
                   );
                 }).toList(),
                 options: CarouselOptions(
                   autoPlay: true,
-                  height: 350,
+                  height: 400.0,
                   viewportFraction: 1,
                   disableCenter: true,
                   autoPlayInterval: Duration(seconds: 4),
-                  // autoPlayAnimationDuration: Duration(milliseconds: 800),
+                  autoPlayAnimationDuration: Duration(milliseconds: 800),
                   onPageChanged: (index, reason) {
                     setState(() {
                       _currentImageIndex = index;
                     });
+
+                    _fetchPaketData(); // Fetch data only when the carousel changes
                   },
                 ),
               ),
@@ -91,195 +132,189 @@ class _HomePageState extends State<HomePage> {
                 left: 20.0,
                 child: Text(
                   'Selamat Datang',
-                  style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          fontWeight: FontWeight.bold)),
+                  style: GoogleFonts.lato(
+                    textStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
                 ),
               ),
               Positioned(
                 top: 50.0,
                 left: 20.0,
                 child: Text(
-                  'Joni', // Ganti dengan nama pengguna yang sesuai
-                  style: GoogleFonts.poppins(
-                      textStyle:
-                          TextStyle(color: Colors.white, fontSize: 20.0)),
+                  "joni",
+                  style: GoogleFonts.lato(
+                    textStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                  ),
                 ),
               ),
             ],
           ),
           SizedBox(height: 20),
-          Text(
-            'Paket Kami',
-            style: GoogleFonts.roboto(
-                textStyle: TextStyle(color: Colors.white, fontSize: 20.0)),
-          ),
-          Row(
-            children: [
-              Expanded(
-                child: Column(
-                  children: [
-                    CardWidget(
-                      cardWidth: 400,
-                      imageWidth: 110.0,
-                      cardHeight: 120.0,
-                      imagePath: 'images/family.jpg',
-                      title: 'Paket Keluarga',
-                      description: '2-10 Orang',
-                      additionalText: 'Dapat 1pcs 10R print foto dan bingkai',
-                      harga: '200.000',
-                    ),
-                    CardWidget(
-                      cardWidth: 400,
-                      imageWidth: 110.0,
-                      cardHeight: 120.0,
-                      imagePath: 'images/prewedding.jpg',
-                      title: 'Paket PraNikah',
-                      description: '1-5 Orang',
-                      additionalText: 'Dapat 2 pcs 10R print foto dan bingkai',
-                      harga: '150.000',
-                    ),
-                    CardWidget(
-                      cardWidth: 400,
-                      imageWidth: 110.0,
-                      cardHeight: 120.0,
-                      imagePath: 'images/graduation.jpg',
-                      title: 'Paket Kelulusan',
-                      description: '1 Orang',
-                      additionalText: 'Dapat 1 pcs 8R print foto',
-                      harga: '100.000',
-                    ),
-                    CardWidget(
-                      cardWidth: 400.0,
-                      imageWidth: 110.0,
-                      cardHeight: 120.0,
-                      imagePath: 'images/withfriends.jpg',
-                      title: 'Paket Bersama Teman',
-                      description: '2-8 Orang',
-                      additionalText: 'Dapat 5 pcs 5R print foto',
-                      harga: '250.000',
-                    ),
-
-                    // Tambahkan CardWidget lainnya di sini
-                  ],
-                ),
-              ),
-            ],
-          ),
-        ]));
-  }
-}
-
-class CardWidget extends StatelessWidget {
-  final double cardWidth;
-  final double imageWidth;
-  final double cardHeight;
-  final String imagePath;
-  final String title;
-  final String description;
-  final String additionalText;
-  final String harga;
-
-  CardWidget({
-    required this.cardWidth,
-    required this.imageWidth,
-    required this.cardHeight,
-    required this.imagePath,
-    required this.title,
-    required this.description,
-    required this.additionalText,
-    required this.harga,
-  });
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      width: cardWidth,
-      height: cardHeight,
-      child: Card(
-        color: Color(0xFF101717),
-        child: Row(
-          children: [
-            Container(
-              width: imageWidth,
-              height: cardHeight,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(5.0),
-                child: Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                ),
+          Padding(
+            padding:
+                EdgeInsets.symmetric(horizontal: 12.0), // Atur jarak horizontal
+            child: Text(
+              'Paket Kami :',
+              style: GoogleFonts.poppins(
+                textStyle: TextStyle(color: Colors.black, fontSize: 20.0),
               ),
             ),
-            Expanded(
-              child: ListTile(
-                title: Text(
-                  title,
-                  style: TextStyle(color: Colors.white, fontSize: 20.0),
-                ),
-                subtitle: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      description,
-                      style: GoogleFonts.roboto(
-                        textStyle:
-                            TextStyle(color: Colors.white, fontSize: 14.0),
-                      ),
+          ),
+          _isLoading
+              ? Center(child: CircularProgressIndicator())
+              : (_paketData!.isEmpty)
+                  ? Text('Tidak ada data yang tersedia.')
+                  : ListView.builder(
+                      physics: NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount: _paketData!.length,
+                      itemBuilder: (context, index) {
+                        final namaPaket = _paketData![index]['nama_paket'];
+                        final orang = _paketData![index]['orang'];
+                        final waktu = _paketData![index]['waktu'];
+                        final keuntungan1 = _paketData![index]['keuntungan1'];
+                        final harga = _paketData![index]['harga'];
+                        final imageUrl = _paketData![index]['url_gambar'];
+
+                        return Padding(
+                          padding: const EdgeInsets.only(
+                              left: 24, right: 24, top: 8, bottom: 16),
+                          child: InkWell(
+                            splashColor: Colors.transparent,
+                            onTap: () {
+                              _navigateToDetailPage(_paketData![index].data()
+                                  as Map<String, dynamic>);
+                            },
+                            child: Container(
+                              decoration: BoxDecoration(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(16.0)),
+                                boxShadow: <BoxShadow>[
+                                  BoxShadow(
+                                    color: Colors.grey.withOpacity(0.6),
+                                    offset: const Offset(4, 4),
+                                    blurRadius: 16,
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: const BorderRadius.all(
+                                    Radius.circular(16.0)),
+                                child: Stack(
+                                  children: <Widget>[
+                                    Column(
+                                      children: <Widget>[
+                                        Image.network(
+                                          imageUrl,
+                                          fit: BoxFit.cover,
+                                          width: double.infinity,
+                                          height: 150.0,
+                                        ),
+                                        Container(
+                                          color: Colors.white,
+                                          child: Row(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.start,
+                                            children: <Widget>[
+                                              Expanded(
+                                                child: Container(
+                                                  child: Padding(
+                                                    padding:
+                                                        const EdgeInsets.only(
+                                                            left: 16,
+                                                            top: 8,
+                                                            bottom: 8),
+                                                    child: Column(
+                                                      mainAxisAlignment:
+                                                          MainAxisAlignment
+                                                              .center,
+                                                      crossAxisAlignment:
+                                                          CrossAxisAlignment
+                                                              .start,
+                                                      children: <Widget>[
+                                                        Text(
+                                                          namaPaket,
+                                                          textAlign:
+                                                              TextAlign.left,
+                                                          style: TextStyle(
+                                                            fontWeight:
+                                                                FontWeight.w600,
+                                                            fontSize: 22,
+                                                            color: Colors.black,
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          orang,
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    1.0),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          waktu,
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    1.0),
+                                                          ),
+                                                        ),
+                                                        Text(
+                                                          keuntungan1,
+                                                          style: TextStyle(
+                                                            fontSize: 14,
+                                                            color: Colors.grey
+                                                                .withOpacity(
+                                                                    1.0),
+                                                          ),
+                                                        ),
+                                                      ],
+                                                    ),
+                                                  ),
+                                                ),
+                                              ),
+                                              Padding(
+                                                padding: const EdgeInsets.only(
+                                                    right: 16, top: 8),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.end,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      'RP ${harga}',
+                                                      textAlign: TextAlign.left,
+                                                      style: TextStyle(
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 22,
+                                                        color: Colors.black,
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ),
+                        );
+                      },
                     ),
-                    Text(
-                      additionalText,
-                      style: GoogleFonts.roboto(
-                        textStyle:
-                            TextStyle(color: Colors.white, fontSize: 14.0),
-                      ),
-                    ),
-                  ],
-                ),
-                trailing: Transform.translate(
-                  offset: Offset(10, 30),
-                  child: TextButton(
-                    onPressed: () {
-                      _navigateToDetailPage(context, {
-                        'title': title,
-                        'description': description,
-                        'harga': harga,
-                        'imagePath': imagePath,
-                      });
-                    },
-                    style: ButtonStyle(
-                      backgroundColor: MaterialStateProperty.all<Color>(
-                        Colors.blueGrey,
-                      ),
-                    ),
-                    child: Text(
-                      'Rp $harga',
-                      style: GoogleFonts.roboto(
-                        textStyle:
-                            TextStyle(color: Colors.white, fontSize: 14.0),
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-            ),
-          ],
-        ),
+        ],
       ),
-    );
-  }
-
-  void _navigateToDetailPage(BuildContext context, Map<String, dynamic> paket) {
-    Navigator.of(context).pushNamed(
-      '/detailhargapage',
-      arguments: {
-        'title': paket['title'],
-        'description': paket['description'],
-        'harga': paket['harga'],
-        'imagePath': paket['imagePath'],
-      },
+      bottomNavigationBar: BottomNavigation(),
     );
   }
 }
