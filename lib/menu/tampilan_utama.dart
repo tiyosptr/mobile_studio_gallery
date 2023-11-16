@@ -4,8 +4,9 @@ import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_studio_gallery/menu/bar.dart';
+import 'package:mobile_studio_gallery/navigation/bar.dart';
 import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
+import 'package:mobile_studio_gallery/chat/tampilan_chat.dart';
 //firebase storage ada 10 file
 
 void main() async {
@@ -96,13 +97,13 @@ class _HomePageState extends State<HomePage> {
                   return Image.asset(
                     imagePath,
                     fit: BoxFit.cover,
-                    width: 430,
-                    height: 496,
+                    width: 400,
+                    height: 500,
                   );
                 }).toList(),
                 options: CarouselOptions(
                   autoPlay: true,
-                  height: 400.0,
+                  height: 450.0,
                   viewportFraction: 1,
                   disableCenter: true,
                   autoPlayInterval: Duration(seconds: 4),
@@ -123,7 +124,13 @@ class _HomePageState extends State<HomePage> {
                   icon: Icon(Icons.chat),
                   color: Colors.white, // Ganti ikon chat sesuai kebutuhan
                   onPressed: () {
-                    // Logika untuk menangani aksi ketika ikon chat ditekan
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) =>
+                            ChatScreen(), // Ganti dengan nama yang benar
+                      ),
+                    );
                   },
                 ),
               ),
