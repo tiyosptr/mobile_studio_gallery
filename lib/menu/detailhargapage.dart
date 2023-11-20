@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_studio_gallery/menu/memilih_jadwal.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 final List<String> studioImages = [
   'images/studio1.png',
@@ -37,15 +38,27 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
             child: Stack(
               alignment: Alignment.centerLeft,
               children: [
-                Image.network(
-                  widget.paket['url_gambar'],
-                  fit: BoxFit.cover,
-                  height: 400.0,
-                  width: 400.0,
+                // Mengganti Image.network dengan CarouselSlider
+                CarouselSlider(
+                  items: studioImages.map((imagePath) {
+                    return Image.network(
+                      widget.paket['url_gambar'],
+                      fit: BoxFit.cover,
+                      width: MediaQuery.of(context).size.width,
+                    );
+                  }).toList(),
+                  options: CarouselOptions(
+                    height: 400.0,
+                    // initialPage: 1,
+                    enableInfiniteScroll: true,
+                    reverse: false,
+                    enlargeCenterPage: true,
+                    scrollDirection: Axis.horizontal,
+                  ),
                 ),
                 Positioned(
-                  top: 30, // Atur posisi vertikal
-                  left: 10, // Atur posisi horizontal
+                  top: 30,
+                  left: 10,
                   child: IconButton(
                     icon: Icon(Icons.arrow_back, color: Colors.black),
                     onPressed: () {
@@ -107,6 +120,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           ),
                         ],
                       ),
+                      SizedBox(height: 10),
                       SizedBox(height: 10),
                       Row(
                         children: [
@@ -209,38 +223,6 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           fontWeight: FontWeight.bold,
                         ),
                       ),
-                      SizedBox(height: 20),
-                      Row(
-                        mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: studioImages.asMap().entries.map((entry) {
-                          final int index = entry.key;
-                          final String imagePath = entry.value;
-                          return GestureDetector(
-                            onTap: () {
-                              setState(() {
-                                _selectedStudioIndex = index;
-                              });
-                            },
-                            child: Container(
-                              width: 80.0,
-                              height: 80.0,
-                              decoration: BoxDecoration(
-                                image: DecorationImage(
-                                  image: AssetImage(imagePath),
-                                  fit: BoxFit.cover,
-                                ),
-                                border: Border.all(
-                                  color: _selectedStudioIndex == index
-                                      ? Colors.blue
-                                      : Colors.transparent,
-                                  width: 2.0,
-                                ),
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                            ),
-                          );
-                        }).toList(),
-                      ),
                       Text('Studio Terpilih: ${_selectedStudioIndex + 1}',
                           style: TextStyle(
                             color: Colors.white,
@@ -248,45 +230,80 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                           ))
                     ],
                   ),
+                  // ... (Elemen-elemen lain dari ListView)
+                  SizedBox(height: 20),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: studioImages.asMap().entries.map((entry) {
+                      final int index = entry.key;
+                      final String imagePath = entry.value;
+                      return GestureDetector(
+                        onTap: () {
+                          setState(() {
+                            _selectedStudioIndex = index;
+                          });
+                        },
+                        child: Container(
+                          width: 80.0,
+                          height: 80.0,
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: AssetImage(imagePath),
+                              fit: BoxFit.cover,
+                            ),
+                            border: Border.all(
+                              color: _selectedStudioIndex == index
+                                  ? Colors.blue
+                                  : Colors.transparent,
+                              width: 2.0,
+                            ),
+                            borderRadius: BorderRadius.circular(10.0),
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+                  // Tombol "Pesan Sekarang" di dalam ListView
+                  SizedBox(height: 20),
+                  Container(
+                    padding: EdgeInsets.symmetric(horizontal: 20),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => JadwalApp(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        primary: Color(0xFF445256),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(5.0),
+                        ),
+                      ),
+                      child: Padding(
+                        padding: EdgeInsets.all(5.0),
+                        child: Row(
+                          mainAxisAlignment: MainAxisAlignment.center,
+                          children: [
+                            Text(
+                              'Pesan Sekarang',
+                              style: TextStyle(
+                                color: Colors.white,
+                                fontSize: 16.0,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
                 ],
               ),
             ),
           ),
         ],
-      ),
-   bottomNavigationBar: Container(
-        padding: EdgeInsets.symmetric(horizontal: 20),
-        child: ElevatedButton(
-          onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => JadwalApp(),
-      ),
-    );
-  },
-          style: ElevatedButton.styleFrom(
-            primary: Color(0xFF445256),
-            shape: RoundedRectangleBorder(
-              borderRadius: BorderRadius.circular(5.0),
-            ),
-          ),
-          child: Padding(
-            padding: EdgeInsets.all(5.0),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                Text(
-                  'Pesan Sekarang',
-                  style: TextStyle(
-                    color: Colors.white,
-                    fontSize: 16.0,
-                  ),
-                ),
-              ],
-            ),
-          ),
-        ),
       ),
     );
   }

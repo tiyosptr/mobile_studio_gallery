@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:mobile_studio_gallery/kesimpulan/tampilan_kesimpulan.dart';
 import 'package:table_calendar/table_calendar.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -198,7 +199,7 @@ class _JadwalAppState extends State<JadwalApp> {
               Navigator.push(
                 context,
                 MaterialPageRoute(
-                  builder: (context) => JadwalApp(),
+                  builder: (context) => SelectStudio(),
                 ),
               );
             },
