@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(GantiData());
@@ -30,7 +31,6 @@ class _GantiDataState extends State<GantiData> {
               // Misalnya, kembali ke layar sebelumnya
             },
           ),
-      
           backgroundColor: Colors.black,
         ),
         body: Padding(
@@ -39,22 +39,21 @@ class _GantiDataState extends State<GantiData> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Ganti Data Bank',
-                  style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
+                Text('Ganti Data Bank',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold),
+                    )),
                 SizedBox(height: 30),
-                Text(
-                  'Ganti Nama',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('Nama',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    )),
                 SizedBox(height: 10),
                 TextFormField(
                   decoration: InputDecoration(
@@ -72,14 +71,13 @@ class _GantiDataState extends State<GantiData> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Text(
-                  'Bank',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+               Text('Bank',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    )),
                 SizedBox(height: 20),
                 Container(
                   width: 356.0,
@@ -107,14 +105,13 @@ class _GantiDataState extends State<GantiData> {
                   ),
                 ),
                 SizedBox(height: 20),
-                Text(
-                  'No Rekening',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+               Text('No Rekening',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    )),
                 TextFormField(
                   decoration: InputDecoration(
                     fillColor: Colors.white,

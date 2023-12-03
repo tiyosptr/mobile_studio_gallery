@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_studio_gallery/navigation/bar.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(MaterialApp(
@@ -12,41 +13,40 @@ class PesananPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       body: Container(
-        color: Colors.black,
         child: Padding(
           padding: const EdgeInsets.all(16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                'Pesanan',
-                style: TextStyle(
-                    fontSize: 20,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white),
+          child:
+              Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+            Text('Pesanan',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 24.0,
+                      fontWeight: FontWeight.bold),
+                )),
+            SizedBox(height: 16),
+            Card(
+              color: Color(0xFF101717),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
               ),
-              SizedBox(height: 16),
-              Card(
-                color: Color(0xFF101717),
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Row(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    children: [
-                      ClipRRect(
-                        borderRadius: BorderRadius.circular(8.0),
-                        child: Image.asset(
-                          'images/family.jpg',
-                          width: 100.0,
-                          height: 100.0,
-                          fit: BoxFit.cover,
-                        ),
-                      ),
-                      SizedBox(width: 16),
-                      Expanded(
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Image.asset(
+                    'images/family.jpg',
+                    height: 160,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(15),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: <Widget>[
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
                               'Paket Keluarga',
@@ -56,55 +56,57 @@ class PesananPage extends StatelessWidget {
                                 color: Colors.white,
                               ),
                             ),
-                            SizedBox(height: 8),
                             Text(
-                              'Rp 200.000',
+                              'Belum Lunas',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white70,
+                                color: Colors.white,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
                           ],
                         ),
-                      ),
-                      SizedBox(width: 16),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.end,
-                        children: [
-                          Text(
-                            'Belum Lunas',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          SizedBox(height: 60),
-                          GestureDetector(
-                            onTap: () {
-                              // Tindakan yang akan diambil saat tautan diklik
-                              print('Lihat Detail diklik');
-                              // Anda dapat menambahkan navigasi atau tindakan lain di sini
-                            },
-                            child: Text(
-                              'Lihat Detail',
+                        Row(
+                          children: [
+                            Text(
+                              'Rp.200.000',
                               style: TextStyle(
                                 fontSize: 14,
-                                color: Colors.white70, // Warna tautan
-                                fontWeight: FontWeight.bold,
-                                decoration: TextDecoration.underline,
+                                color: Colors.white,
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    ],
+                          ],
+                        ),
+                        Row(
+                          children: [
+                            SizedBox(
+                              width: 260,
+                            ),
+                            GestureDetector(
+                              onTap: () {
+                                // Tindakan yang akan diambil saat tautan diklik
+                                print('Lihat Detail diklik');
+                                // Anda dapat menambahkan navigasi atau tindakan lain di sini
+                              },
+                              child: Text(
+                                'Lihat Detail',
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.white70, // Warna tautan
+                                  fontWeight: FontWeight.bold,
+                                  decoration: TextDecoration.underline,
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
                   ),
-                ),
+                ],
               ),
-            ],
-          ),
+            ),
+          ]),
         ),
       ),
       bottomNavigationBar: BottomNavigation(),

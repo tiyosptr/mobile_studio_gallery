@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 void main() {
   runApp(GantiData());
@@ -15,14 +16,13 @@ class GantiData extends StatelessWidget {
           leading: IconButton(
             icon: Icon(
               Icons.arrow_back,
-              color:  Colors.white,
+              color: Colors.white,
             ),
             onPressed: () {
               // Aksi ketika tombol kembali di-klik
               // Misalnya, kembali ke layar sebelumnya
             },
           ),
-
           backgroundColor: Colors.black,
         ),
         body: Padding(
@@ -31,23 +31,22 @@ class GantiData extends StatelessWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                Text(
-                  'Ganti Data Akun',
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('Ganti Data Akun',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 24.0,
+                          fontWeight: FontWeight.bold),
+                    )),
                 SizedBox(height: 20),
-                Text(
-                  'Ganti Email',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('Ganti Email',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    )),
+                SizedBox(height: 10),
                 TextFormField(
                   initialValue: 'jhondhoe@gmail.com',
                   obscureText: false,
@@ -66,14 +65,15 @@ class GantiData extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-                Text(
-                  'Ganti Nama Pengguna',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('Ganti Nama Pengguna',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    )),
+                SizedBox(height: 10),
+
                 TextFormField(
                   initialValue: 'jhondhoe',
                   obscureText: false,
@@ -93,14 +93,15 @@ class GantiData extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
 
-                Text(
-                  'Ganti Password',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('Ganti Password',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    )),
+                     SizedBox(height: 10),
+
                 TextFormField(
                   initialValue: '*******',
                   obscureText: true,
@@ -120,14 +121,15 @@ class GantiData extends StatelessWidget {
                 ),
                 SizedBox(height: 20),
 
-                Text(
-                  'Konfirmasi Password',
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
+                Text('Konfirmasi Password',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.bold),
+                    )),
+                     SizedBox(height: 10),
+
                 TextFormField(
                   initialValue: '*******',
                   obscureText: true,
@@ -147,20 +149,19 @@ class GantiData extends StatelessWidget {
                 ),
                 Expanded(
                     child: SizedBox()), // Memberikan ruang ke tombol konfirmasi
-             ElevatedButton(
-  onPressed: () {
-    // Aksi ketika tombol "Konfirmasi" di-klik
-    // Misalnya, validasi input dan simpan perubahan
-  },
-  style: ElevatedButton.styleFrom(
-    primary: Color(0xFF445256), // Warna 445256
-  ),
-  child: Text(
-    'Konfirmasi',
-    style: TextStyle(color: Colors.white), // Warna teks putih
-  ),
-),
-
+                ElevatedButton(
+                  onPressed: () {
+                    // Aksi ketika tombol "Konfirmasi" di-klik
+                    // Misalnya, validasi input dan simpan perubahan
+                  },
+                  style: ElevatedButton.styleFrom(
+                    primary: Color(0xFF445256), // Warna 445256
+                  ),
+                  child: Text(
+                    'Konfirmasi',
+                    style: TextStyle(color: Colors.white), // Warna teks putih
+                  ),
+                ),
               ],
             ),
           ),
