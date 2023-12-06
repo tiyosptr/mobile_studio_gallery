@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_studio_gallery/user/ganti_data_bank.dart';
+import 'package:mobile_studio_gallery/user/ganti_email.dart';
 
 void main() {
   runApp(DataPribadi());
@@ -65,6 +67,10 @@ class TampilanDataPribadi extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         // Aksi ketika tombol "Ganti" di-klik
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => GantiData()),
+                        );
                         // Misalnya, tampilkan dialog penggantian untuk email
                       },
                       child: Text('Ganti'),
@@ -114,12 +120,12 @@ class TampilanDataPribadi extends StatelessWidget {
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
               Text('Data Bank',
-              style: GoogleFonts.roboto(
-                textStyle: TextStyle(
-                    color: Colors.white,
-                    fontSize: 18.0,
-                    fontWeight: FontWeight.bold),
-              )),
+                  style: GoogleFonts.roboto(
+                    textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.bold),
+                  )),
               Expanded(
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.end,
@@ -127,6 +133,11 @@ class TampilanDataPribadi extends StatelessWidget {
                     ElevatedButton(
                       onPressed: () {
                         // Aksi ketika tombol "Ganti" di-klik
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => GantiDataBank()),
+                        );
                         // Misalnya, tampilkan dialog penggantian untuk data bank
                       },
                       child: Text('Ganti'),

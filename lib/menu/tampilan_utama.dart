@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_studio_gallery/chat/tampilan_chat.dart';
+import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_studio_gallery/navigation/bar.dart';
-import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
-import 'package:mobile_studio_gallery/chat/tampilan_chat.dart';
-//firebase storage ada 10 file
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -27,289 +25,330 @@ class PaketApp extends StatelessWidget {
 }
 
 class HomePage extends StatefulWidget {
-  const HomePage({Key? key}) : super(key: key);
-
   @override
   _HomePageState createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
-  int _currentImageIndex = 0;
-  late User _currentUser;
-  List<DocumentSnapshot>? _paketData;
-  bool _isLoading = true; // Menyimpan data yang telah diambil
-
-  final List<String> imagePaths = [
-    'images/family.jpg',
-    'images/prewedding.jpg',
-    'images/graduation.jpg',
-    'images/withfriends.jpg',
-  ];
+  late List<Map<String, dynamic>> paketList;
+  List<bool> checkedItems = [];
+  late QuerySnapshot querySnapshot; // Tambahkan variabel ini
+  bool isLoading = true; // Tambahkan variabel isLoading
+  bool showTambahDataButton = false;
 
   @override
   void initState() {
     super.initState();
-    // Check if a user is authenticated
-    if (FirebaseAuth.instance.currentUser != null) {
-      _currentUser = FirebaseAuth.instance.currentUser!;
-    } else {
-      // Handle the case where the user is not authenticated
-      // You can display a login screen or handle it as needed
-    }
+    paketList = [];
+    getPaketList();
+  }
+
+  void getPaketList() {
+    FirebaseFirestore.instance
+        .collection('Paket')
+        .orderBy('nama_paket')
+        .get()
+        .then((snapshot) {
+      setState(() {
+        querySnapshot = snapshot; // Simpan snapshot di variabel ini
+        List<Map<String, dynamic>> tempList = [];
+        snapshot.docs.forEach((document) {
+          Map<String, dynamic> paket = document.data() as Map<String, dynamic>;
+          tempList.add(paket);
+        });
+        tempList.sort((a, b) => a['nama_paket'].compareTo(b['nama_paket']));
+        paketList = tempList;
+        isLoading = false; // Set isLoading menjadi false setelah data dimuat
+      });
+    }).catchError((error) {
+      print('Error while loading data: $error');
+      setState(() {
+        isLoading = false; // Set isLoading menjadi false jika terjadi kesalahan
+      });
+    });
   }
 
   void _navigateToDetailPage(Map<String, dynamic> paket) {
+    String docId = '';
+    for (var doc in querySnapshot.docs) {
+      if (doc['nama_paket'] == paket['nama_paket']) {
+        docId = doc.id;
+        break;
+      }
+    }
     Navigator.of(context).push(
       MaterialPageRoute(
-        builder: (context) => DetailHargaPage(paket: paket),
+        builder: (context) => DetailHargaPage(paket: paket, docId: docId),
       ),
     );
-  }
-
-  Future<void> _fetchPaketData() async {
-    try {
-      final querySnapshot =
-          await FirebaseFirestore.instance.collection('Paket').get();
-      setState(() {
-        _paketData = querySnapshot.docs;
-        _isLoading = false; // Simpan data yang telah diambil
-      });
-    } catch (e) {
-      print('Error fetching data: $e');
-      setState(() {
-        _isLoading =
-            false; // Nonaktifkan indikator loading dalam kasus kesalahan
-      });
-    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SingleChildScrollView(
-        child: Column(
+        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+        body: Column(
           children: [
-            Stack(
-              alignment: Alignment.topCenter,
-              children: [
-                CarouselSlider(
-                  items: imagePaths.map((imagePath) {
-                    return Image.asset(
-                      imagePath,
-                      fit: BoxFit.cover,
-                      width: 400,
-                      height: 500,
-                    );
-                  }).toList(),
-                  options: CarouselOptions(
-                    autoPlay: true,
-                    height: 450.0,
-                    viewportFraction: 1,
-                    disableCenter: true,
-                    autoPlayInterval: Duration(seconds: 4),
-                    autoPlayAnimationDuration: Duration(milliseconds: 800),
-                    onPageChanged: (index, reason) {
-                      setState(() {
-                        _currentImageIndex = index;
-                      });
-
-                      _fetchPaketData(); // Fetch data only when the carousel changes
+            if (isLoading) // Tambahkan kondisi untuk menampilkan CircularProgressIndicator
+              Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
+                ),
+              ),
+            if (!isLoading && paketList.isEmpty)
+              Expanded(
+                child: Center(
+                  child: Text('Data Kosong'),
+                ),
+              ),
+            if (!isLoading && paketList.isNotEmpty)
+              Stack(
+                alignment: Alignment.topCenter,
+                children: [
+                  StreamBuilder<QuerySnapshot>(
+                    stream: FirebaseFirestore.instance
+                        .collection('Paket')
+                        .snapshots(),
+                    builder: (context, snapshot) {
+                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                        List<String> imageUrls = [];
+                        snapshot.data!.docs.forEach((doc) {
+                          if (doc['url_gambar'] != null) {
+                            imageUrls.add(doc['url_gambar']);
+                          }
+                        });
+                        if (imageUrls.isNotEmpty) {
+                          return CarouselSlider(
+                            items: imageUrls.map((imageUrl) {
+                              return Image.network(
+                                imageUrl,
+                                fit: BoxFit.cover,
+                              );
+                            }).toList(),
+                            options: CarouselOptions(
+                              autoPlay: true,
+                              height: 380.0,
+                              viewportFraction: 1,
+                              disableCenter: true,
+                              autoPlayInterval: Duration(seconds: 4),
+                              autoPlayAnimationDuration:
+                                  Duration(milliseconds: 800),
+                              onPageChanged: (index, reason) {
+                                setState(() {});
+                              },
+                            ),
+                          );
+                        } else {
+                          return Center(child: Text('Gambar Tidak Tersedia'));
+                        }
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        return Center(child: CircularProgressIndicator());
+                      }
                     },
                   ),
-                ),
-                Positioned(
-                  top: 15.0,
-                  right: 10.0,
-                  child: IconButton(
-                    icon: Icon(Icons.chat),
-                    color: Colors.white, // Ganti ikon chat sesuai kebutuhan
-                    onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) =>
-                              ChatScreen(), // Ganti dengan nama yang benar
+                  Positioned(
+                    top: 50.0,
+                    left: 20.0,
+                    child: Text(
+                      'Selamat Datang',
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 4.0,
+                              color: Colors.black,
+                              offset: Offset(2.0, 2.0),
+                            ),
+                          ],
                         ),
-                      );
-                    },
-                  ),
-                ),
-                Positioned(
-                  top: 20.0,
-                  left: 20.0,
-                  child: Text(
-                    'Selamat Datang',
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                      ),
                     ),
                   ),
-                ),
-                Positioned(
-                  top: 50.0,
-                  left: 20.0,
-                  child: Text(
-                    "joni",
-                    style: GoogleFonts.lato(
-                      textStyle: TextStyle(color: Colors.white, fontSize: 20.0),
+                  Positioned(
+                    top: 80.0,
+                    left: 20.0,
+                    child: Text(
+                      'User',
+                      style: GoogleFonts.poppins(
+                        textStyle: TextStyle(
+                          color: Colors.white,
+                          fontSize: 20.0,
+                          shadows: [
+                            Shadow(
+                              blurRadius: 4.0,
+                              color: Colors.black,
+                              offset: Offset(2.0, 2.0),
+                            ),
+                          ],
+                        ),
+                      ),
                     ),
+                  ),
+                ],
+              ),
+            SizedBox(height: 10),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.only(left: 15.0),
+                  child: Text(
+                    'PAKET KAMI:',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                        color: const Color.fromARGB(255, 0, 0, 0),
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
               ],
             ),
-            SizedBox(height: 20),
-            Padding(
-              padding: EdgeInsets.symmetric(
-                  horizontal: 12.0), // Atur jarak horizontal
-              child: Text(
-                'Paket Kami :',
-                style: GoogleFonts.poppins(
-                  textStyle: TextStyle(color: Colors.black, fontSize: 20.0),
+            if (isLoading) // Tampilkan indikator loading jika isLoading adalah true
+              Expanded(
+                child: Center(
+                  child: CircularProgressIndicator(),
                 ),
               ),
-            ),
-            _isLoading
-                ? Center(child: CircularProgressIndicator())
-                : (_paketData!.isEmpty)
-                    ? Text('Tidak ada data yang tersedia.')
-                    : ListView.builder(
-                        physics: NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount: _paketData!.length,
-                        itemBuilder: (context, index) {
-                          final namaPaket = _paketData![index]['nama_paket'];
-                          final orang = _paketData![index]['orang'];
-                          final waktu = _paketData![index]['waktu'];
-                          final keuntungan1 = _paketData![index]['keuntungan1'];
-                          final harga = _paketData![index]['harga'];
-                          final imageUrl = _paketData![index]['url_gambar'];
+            if (!isLoading &&
+                paketList
+                    .isNotEmpty) // Tampilkan data jika isLoading adalah false
+              Expanded(
+                child: ListView.builder(
+                  shrinkWrap: true,
+                  itemCount: paketList.length,
+                  itemBuilder: (context, index) {
+                    final paket = paketList[index];
+                    final namaPaket = paket['nama_paket'];
+                    final orang = paket['orang'];
+                    final waktu = paket['waktu'];
+                    final keuntungan1 = paket['keuntungan1'];
+                    final harga = paket['harga'];
+                    final imageUrl = paket['url_gambar'];
 
-                          return Padding(
-                            padding: const EdgeInsets.only(
-                                left: 24, right: 24, top: 8, bottom: 16),
-                            child: InkWell(
-                              splashColor: Colors.transparent,
-                              onTap: () {
-                                _navigateToDetailPage(_paketData![index].data()
-                                    as Map<String, dynamic>);
-                              },
-                              child: Container(
-                                decoration: BoxDecoration(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(16.0)),
-                                  boxShadow: <BoxShadow>[
-                                    BoxShadow(
-                                      color: Colors.grey.withOpacity(0.6),
-                                      offset: const Offset(4, 4),
-                                      blurRadius: 16,
+                    return Padding(
+                      padding: const EdgeInsets.only(
+                          left: 24, right: 24, top: 5, bottom: 16),
+                      child: InkWell(
+                        splashColor: Colors.transparent,
+                        onTap: () {
+                          _navigateToDetailPage(paket);
+                        },
+                        child: Container(
+                          decoration: BoxDecoration(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(16.0)),
+                            boxShadow: <BoxShadow>[
+                              BoxShadow(
+                                color: Colors.grey.withOpacity(0.6),
+                                offset: const Offset(4, 4),
+                                blurRadius: 16,
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius:
+                                const BorderRadius.all(Radius.circular(16.0)),
+                            child: Stack(
+                              children: <Widget>[
+                                Column(
+                                  children: <Widget>[
+                                    Image.network(
+                                      imageUrl ?? '',
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                      height: 150.0,
                                     ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: const BorderRadius.all(
-                                      Radius.circular(16.0)),
-                                  child: Stack(
-                                    children: <Widget>[
-                                      Column(
+                                    Container(
+                                      color: Colors.black,
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
                                         children: <Widget>[
-                                          Image.network(
-                                            imageUrl,
-                                            fit: BoxFit.cover,
-                                            width: double.infinity,
-                                            height: 150.0,
+                                          Expanded(
+                                            child: Container(
+                                              child: Padding(
+                                                padding: const EdgeInsets.only(
+                                                    left: 16,
+                                                    top: 8,
+                                                    bottom: 8),
+                                                child: Column(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.center,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.start,
+                                                  children: <Widget>[
+                                                    Text(
+                                                      namaPaket ?? '',
+                                                      textAlign: TextAlign.left,
+                                                      style: TextStyle(
+                                                        decoration:
+                                                            TextDecoration
+                                                                .underline,
+                                                        decorationThickness:
+                                                            2.0,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        fontSize: 22,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      orang ?? '',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white
+                                                            .withOpacity(1.0),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      waktu ?? '',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white
+                                                            .withOpacity(1.0),
+                                                      ),
+                                                    ),
+                                                    Text(
+                                                      keuntungan1 ?? '',
+                                                      style: TextStyle(
+                                                        fontSize: 14,
+                                                        color: Colors.white
+                                                            .withOpacity(1.0),
+                                                      ),
+                                                    ),
+                                                  ],
+                                                ),
+                                              ),
+                                            ),
                                           ),
-                                          Container(
-                                            color: Colors.white,
-                                            child: Row(
+                                          Padding(
+                                            padding: const EdgeInsets.only(
+                                                right: 16, top: 8),
+                                            child: Column(
                                               mainAxisAlignment:
                                                   MainAxisAlignment.center,
                                               crossAxisAlignment:
-                                                  CrossAxisAlignment.start,
+                                                  CrossAxisAlignment.end,
                                               children: <Widget>[
-                                                Expanded(
-                                                  child: Container(
-                                                    child: Padding(
-                                                      padding:
-                                                          const EdgeInsets.only(
-                                                              left: 16,
-                                                              top: 8,
-                                                              bottom: 8),
-                                                      child: Column(
-                                                        mainAxisAlignment:
-                                                            MainAxisAlignment
-                                                                .center,
-                                                        crossAxisAlignment:
-                                                            CrossAxisAlignment
-                                                                .start,
-                                                        children: <Widget>[
-                                                          Text(
-                                                            namaPaket,
-                                                            textAlign:
-                                                                TextAlign.left,
-                                                            style: TextStyle(
-                                                              fontWeight:
-                                                                  FontWeight
-                                                                      .w600,
-                                                              fontSize: 22,
-                                                              color:
-                                                                  Colors.black,
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            orang,
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              color: Colors.grey
-                                                                  .withOpacity(
-                                                                      1.0),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            waktu,
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              color: Colors.grey
-                                                                  .withOpacity(
-                                                                      1.0),
-                                                            ),
-                                                          ),
-                                                          Text(
-                                                            keuntungan1,
-                                                            style: TextStyle(
-                                                              fontSize: 14,
-                                                              color: Colors.grey
-                                                                  .withOpacity(
-                                                                      1.0),
-                                                            ),
-                                                          ),
-                                                        ],
-                                                      ),
-                                                    ),
-                                                  ),
-                                                ),
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.only(
-                                                          right: 16, top: 8),
-                                                  child: Column(
-                                                    mainAxisAlignment:
-                                                        MainAxisAlignment
-                                                            .center,
-                                                    crossAxisAlignment:
-                                                        CrossAxisAlignment.end,
-                                                    children: <Widget>[
-                                                      Text(
-                                                        'RP ${harga}',
-                                                        textAlign:
-                                                            TextAlign.left,
-                                                        style: TextStyle(
-                                                          fontWeight:
-                                                              FontWeight.w600,
-                                                          fontSize: 22,
-                                                          color: Colors.black,
-                                                        ),
-                                                      ),
-                                                    ],
+                                                Text(
+                                                  'RP ${harga ?? ''}',
+                                                  textAlign: TextAlign.left,
+                                                  style: TextStyle(
+                                                    decoration: TextDecoration
+                                                        .underline,
+                                                    decorationThickness: 2.0,
+                                                    fontWeight: FontWeight.w600,
+                                                    fontSize: 21,
+                                                    color: Colors.white,
                                                   ),
                                                 ),
                                               ],
@@ -317,18 +356,47 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                         ],
                                       ),
-                                    ],
-                                  ),
+                                    ),
+                                  ],
                                 ),
-                              ),
+                              ],
                             ),
-                          );
-                        },
+                          ),
+                        ),
                       ),
+                    );
+                  },
+                ),
+              ),
           ],
         ),
-      ),
-      bottomNavigationBar: BottomNavigation(),
-    );
+        floatingActionButton: Padding(
+          padding: EdgeInsets.fromLTRB(0, 120, 0, 52),
+          child: Align(
+            alignment: Alignment.topRight,
+            child: FloatingActionButton(
+              onPressed: () {
+                // Navigasi ke halaman Obrolan
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => ChatScreen(
+                            receiverUserEmail: '',
+                            receiverUserID: '',
+                          )),
+                );
+              },
+              child: const Icon(Icons.chat),
+              backgroundColor:
+                  const Color.fromARGB(255, 81, 85, 81).withOpacity(0.3),
+              elevation: 2,
+              shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(12)),
+            ),
+          ),
+        ),
+        bottomNavigationBar:
+            BottomNavigation() // Use the BottomNavigation widget here
+        );
   }
 }

@@ -1,12 +1,25 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_studio_gallery/kesimpulan/tampilan_pembayaran_transfer.dart';
-
-void main() {
-  runApp(SelectStudio());
-}
+import 'package:mobile_studio_gallery/kesimpulan/tampilan_pembayaran_depan.dart';
+import 'package:intl/intl.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class SelectStudio extends StatefulWidget {
+  final Map<String, dynamic> paket;
+  final int selectedStudioIndex;
+  final String selectedDate;
+  final String selectedTime;
+  final String docId;
+  // Constructor with named parameters
+
+  const SelectStudio(
+      {Key? key,
+      required this.paket,
+      required this.selectedStudioIndex,
+      required this.selectedDate,
+      required this.selectedTime,
+      required this.docId})
+      : super(key: key);
   @override
   _SelectStudioState createState() => _SelectStudioState();
 }
@@ -15,13 +28,89 @@ class _SelectStudioState extends State<SelectStudio> {
   bool isPaymentUpfront = false;
   bool isMandiriSelected = false;
   bool isBCASelected = false;
+  String selectedBank = '';
+
+  void _showWarning(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        duration: Duration(seconds: 2),
+      ),
+    );
+  }
+
+  void _saveBookingToFirestore() async {
+    // Get a reference to the Firestore collection
+    CollectionReference pemesananCollection =
+        FirebaseFirestore.instance.collection('Pemesanan');
+
+    // Get the current date and time for a unique document ID
+    DateTime now = DateTime.now();
+    String documentId =
+        '${widget.docId}_${DateFormat('yyyyMMdd_HHmmss').format(now)}';
+
+    // Prepare data to be added to Firestore
+    Map<String, dynamic> bookingData = {
+      'nama_paket': widget.paket['nama_paket'],
+      'jam': widget.selectedTime,
+      'status': 'DiBooking',
+      'tanggal': widget.selectedDate,
+      'studio_dipilih': 'Studio ${widget.selectedStudioIndex + 1}',
+      'metode_pembayaran': isPaymentUpfront
+          ? 'Pembayaran didepan/lunas'
+          : 'Transfer bank', // You can customize this logic
+      'status_pembayaran': isPaymentUpfront ? 'Lunas' : 'Belum lunas',
+      'harga':
+          isPaymentUpfront ? widget.paket['harga'] ~/ 2 : widget.paket['harga'],
+      // Add other attributes as needed
+    };
+
+    // Add the booking data to Firestore with a custom document ID
+    await pemesananCollection.doc(documentId).set(bookingData);
+
+    // Show an alert after successfully booking
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Booking Successful'),
+          content: Text('Your booking has been successfully recorded.'),
+          actions: <Widget>[
+            TextButton(
+              onPressed: () {
+                Navigator.of(context).pop(); // Close the alert
+                // Navigate to the payment screen
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => PembayaranScreen(
+                      paket: widget.paket,
+                      selectedStudioIndex: widget.selectedStudioIndex,
+                      selectedDate: widget.selectedDate,
+                      selectedTime: widget.selectedTime,
+                      upfrontPaymentSelected: isPaymentUpfront,
+                      totalHarga: isPaymentUpfront
+                          ? widget.paket['harga'] / 2
+                          : widget.paket['harga'].toDouble(),
+                      selectedBank: selectedBank,
+                    ),
+                  ),
+                );
+              },
+              child: Text('OK'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         home: Scaffold(
-          backgroundColor: Colors.black,
+          backgroundColor: Colors.white,
           body: Padding(
             padding: const EdgeInsets.all(10.0),
             child: Column(
@@ -30,7 +119,7 @@ class _SelectStudioState extends State<SelectStudio> {
                 Row(
                   children: [
                     IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.white),
+                      icon: Icon(Icons.arrow_back, color: Colors.black87),
                       onPressed: () {
                         Navigator.pop(context);
                       },
@@ -40,43 +129,59 @@ class _SelectStudioState extends State<SelectStudio> {
                 Text(
                   'Kesimpulan',
                   style: GoogleFonts.roboto(
-                    textStyle: TextStyle(color: Colors.white70, fontSize: 18.0),
+                    textStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w700),
                   ),
                 ),
                 SizedBox(height: 10),
                 Center(
                   child: Text(
-                    'Paket Keluarga',
-                    style: TextStyle(color: Colors.white, fontSize: 25),
+                    widget.paket['nama_paket'], // Display the selected package
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 25,
+                        fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
                 SizedBox(height: 20),
                 Text(
-                  'Studio yang dipilih',
+                  'Studio yang dipilih: Studio ${widget.selectedStudioIndex + 1}', // Display the selected studio
                   style: GoogleFonts.roboto(
-                    textStyle: TextStyle(color: Colors.white70, fontSize: 18.0),
+                    textStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18.0,
+                        fontWeight: FontWeight.w700),
                   ),
                 ),
-                SizedBox(height: 20),
+                SizedBox(height: 10),
                 Container(
                   width: 400,
                   height: 200,
                   child: Image.asset(
-                    'images/studio1.png',
+                    'images/studio${widget.selectedStudioIndex + 1}.png', // Assuming images are named studio1.png, studio2.png, etc.
                     fit: BoxFit.cover,
                   ),
                 ),
                 SizedBox(height: 20),
                 Text(
                   'Jadwal',
-                  style: TextStyle(color: Colors.white, fontSize: 18),
+                  style: TextStyle(
+                      color: Colors.black,
+                      fontSize: 19,
+                      fontWeight: FontWeight.w700),
                   textAlign: TextAlign.left,
                 ),
+                SizedBox(height: 5),
                 Text(
-                  '13 Desember 17.00 - 17.30',
+                  '${DateFormat('dd MMMM yyyy').format(DateFormat('dd-MM-yyyy').parse(widget.selectedDate))} - ${widget.selectedTime}',
                   style: GoogleFonts.roboto(
-                    textStyle: TextStyle(color: Colors.white, fontSize: 14.0),
+                    textStyle: TextStyle(
+                        color: Colors.black,
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.w700),
                   ),
                 ),
                 SizedBox(height: 20),
@@ -88,45 +193,41 @@ class _SelectStudioState extends State<SelectStudio> {
                       children: [
                         Expanded(
                           child: Text(
-                            'Pembayaran Didepan\n  Rp.100.000',
+                            'Pembayaran Didepan\n ${isPaymentUpfront ? 'Rp.${widget.paket['harga'] ~/ 2}' : 'Rp.${widget.paket['harga']}'}',
                             style: TextStyle(
-                                color: isPaymentUpfront
-                                    ? Colors.white
-                                    : Colors.white54,
-                                fontSize: 16),
+                              color: isPaymentUpfront
+                                  ? Colors.black
+                                  : Colors.black54,
+                              fontSize: 17,
+                            ),
                             textAlign: TextAlign.left,
                           ),
                         ),
-                        Theme(
-                          data: ThemeData(
-                            // unselectedWidgetColor: Colors.white,
-                            checkboxTheme: CheckboxThemeData(
-                              fillColor: MaterialStateProperty.resolveWith(
-                                (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.selected)) {
-                                    return Colors.white;
-                                  }
-                                  return Colors.grey;
-                                },
-                              ),
-                            ),
+                        Container(
+                          width:
+                              50.0, // Sesuaikan lebar Container sesuai kebutuhan
+                          height:
+                              15.0, // Sesuaikan tinggi Container sesuai kebutuhan
+                          decoration: BoxDecoration(
+                            borderRadius: BorderRadius.circular(2.0),
+                            border: Border.all(color: Colors.white, width: 2.0),
                           ),
                           child: Checkbox(
                             value: isPaymentUpfront,
                             onChanged: (value) {
                               setState(() {
                                 isPaymentUpfront = value!;
+                                // Uncheck both Mandiri and BCA when Pembayaran Didepan is selected
+                                if (isPaymentUpfront) {
+                                  selectedBank = '';
+                                }
                               });
                             },
-                            checkColor: Colors.black,
-                            activeColor: Colors.white,
+                            checkColor: Colors.white,
+                            activeColor: Colors.blue,
                             materialTapTargetSize:
                                 MaterialTapTargetSize.shrinkWrap,
                             visualDensity: VisualDensity.compact,
-                            shape: RoundedRectangleBorder(
-                              side: BorderSide(color: Colors.white, width: 2.0),
-                              borderRadius: BorderRadius.circular(2.0),
-                            ),
                           ),
                         ),
                       ],
@@ -135,9 +236,9 @@ class _SelectStudioState extends State<SelectStudio> {
                     Text(
                       'Transfer ke bank',
                       style: GoogleFonts.roboto(
-                        textStyle:
-                            TextStyle(color: Colors.white, fontSize: 18.0),
-                      ),
+                          textStyle:
+                              TextStyle(color: Colors.black, fontSize: 19.0),
+                          fontWeight: FontWeight.w700),
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -146,40 +247,23 @@ class _SelectStudioState extends State<SelectStudio> {
                           child: Text(
                             'Mandiri 10900********',
                             style: TextStyle(
-                                color: isMandiriSelected
-                                    ? Colors.white
-                                    : Colors.white54,
-                                fontSize: 16),
-                          ),
-                        ),
-                        Theme(
-                          data: ThemeData(
-                            // unselectedWidgetColor: Colors.white,
-                            checkboxTheme: CheckboxThemeData(
-                              fillColor: MaterialStateProperty.resolveWith(
-                                (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.selected)) {
-                                    // return Colors.white;
-                                  }
-                                  return Colors.grey;
-                                },
-                              ),
+                              color: selectedBank == 'Mandiri 10900********'
+                                  ? Colors.black
+                                  : Colors.black54,
+                              fontSize: 16,
                             ),
                           ),
-                          child: Checkbox(
-                            value: isMandiriSelected,
-                            onChanged: (value) {
-                              setState(() {
-                                isMandiriSelected = value!;
-                              });
-                            },
-                            checkColor: Colors.white,
-                            activeColor: Colors.blue,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                            shape: CircleBorder(),
-                          ),
+                        ),
+                        Radio<String>(
+                          value: 'Mandiri 10900********',
+                          groupValue: selectedBank,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedBank = value!;
+                              // Uncheck Pembayaran Didepan when Mandiri is selected
+                              isPaymentUpfront = false;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -190,40 +274,23 @@ class _SelectStudioState extends State<SelectStudio> {
                           child: Text(
                             'BCA 21*********',
                             style: TextStyle(
-                                color: isBCASelected
-                                    ? Colors.white
-                                    : Colors.white54,
-                                fontSize: 16),
-                          ),
-                        ),
-                        Theme(
-                          data: ThemeData(
-                            // unselectedWidgetColor: Colors.white,
-                            checkboxTheme: CheckboxThemeData(
-                              fillColor: MaterialStateProperty.resolveWith(
-                                (Set<MaterialState> states) {
-                                  if (states.contains(MaterialState.selected)) {
-                                    return Colors.white;
-                                  }
-                                  return Colors.grey;
-                                },
-                              ),
+                              color: selectedBank == 'BCA 21*********'
+                                  ? Colors.black
+                                  : Colors.black54,
+                              fontSize: 16,
                             ),
                           ),
-                          child: Checkbox(
-                            value: isBCASelected,
-                            onChanged: (value) {
-                              setState(() {
-                                isBCASelected = value!;
-                              });
-                            },
-                            checkColor: Colors.white,
-                            activeColor: Colors.blue,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                            shape: CircleBorder(),
-                          ),
+                        ),
+                        Radio<String>(
+                          value: 'BCA 21*********',
+                          groupValue: selectedBank,
+                          onChanged: (value) {
+                            setState(() {
+                              selectedBank = value!;
+                              // Uncheck Pembayaran Didepan when BCA is selected
+                              isPaymentUpfront = false;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -238,10 +305,15 @@ class _SelectStudioState extends State<SelectStudio> {
               padding: EdgeInsets.symmetric(horizontal: 20),
               child: ElevatedButton(
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => PembayaranScreen()),
-                  );
+                  if (selectedBank.isEmpty && !isPaymentUpfront) {
+                    _showWarning(
+                      context,
+                      'Pilih metode pembayaran terlebih dahulu.',
+                    );
+                  } else {
+                    // Save booking details to Firestore
+                    _saveBookingToFirestore();
+                  }
                 },
                 style: ElevatedButton.styleFrom(
                   primary: Color(0xFF445256),
@@ -254,12 +326,27 @@ class _SelectStudioState extends State<SelectStudio> {
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Text(
-                        'Pesan Sekarang',
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontSize: 16.0,
-                        ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Text(
+                            'Pesan Sekarang',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                          SizedBox(
+                            width: 100.0,
+                          ),
+                          Text(
+                            '${isPaymentUpfront ? 'Rp.${widget.paket['harga'] ~/ 2}' : 'Rp.${widget.paket['harga']}'}',
+                            style: TextStyle(
+                              color: Colors.white,
+                              fontSize: 16.0,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),

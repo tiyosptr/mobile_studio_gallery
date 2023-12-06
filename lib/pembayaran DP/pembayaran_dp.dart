@@ -1,19 +1,58 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-void main() {
-  runApp(PembayaranDP());
-}
+import 'package:intl/intl.dart';
 
 class PembayaranDP extends StatelessWidget {
+  final Map<String, dynamic> dataPemesanan;
+  final Map<String, dynamic> dataPaket;
+  final String namaPaket;
+  final String gambar;
+  final String tanggal;
+  final String status_pembayaran;
+  final String jam;
+  final String waktu;
+  final String orang;
+  final int harga;
+  final String ganti_pakaian;
+  final String documentId; // Add this line
+
+  PembayaranDP({
+    required this.dataPemesanan,
+    required this.dataPaket,
+    required this.namaPaket,
+    required this.gambar,
+    required this.tanggal,
+    required this.jam,
+    required this.ganti_pakaian,
+    required this.documentId,
+    required this.status_pembayaran,
+    required this.waktu,
+    required this.orang,
+    required this.harga, // Add this line
+  });
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
+        appBar: AppBar(
+          title: Text('Detail Pembayaran'),
+        ),
         body: Stack(
           children: [
-            MyStepper(),
+            MyStepper(
+              namaPaket: namaPaket,
+              gambar: gambar,
+              jam: jam,
+              ganti_pakaian: ganti_pakaian,
+              tanggal: tanggal,
+              documentId: documentId,
+              status_pembayaran: status_pembayaran,
+              orang: orang,
+              waktu: waktu,
+              harga: harga,
+            ), // Pass namaPaket here
             Positioned(
               top: 0,
               left: 0,
@@ -21,8 +60,7 @@ class PembayaranDP extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
-                  // Tambahkan logika untuk navigasi kembali atau sesuai kebutuhan
-                  print('Back button pressed');
+                  Navigator.pop(context);
                 },
               ),
             ),
@@ -34,6 +72,29 @@ class PembayaranDP extends StatelessWidget {
 }
 
 class MyStepper extends StatefulWidget {
+  final String namaPaket;
+  final String gambar;
+  final String tanggal;
+  final String jam;
+  final String orang;
+  final String waktu;
+  final int harga;
+  final String ganti_pakaian;
+  final String documentId;
+  final String status_pembayaran;
+
+  MyStepper(
+      {required this.namaPaket,
+      required this.gambar,
+      required this.tanggal,
+      required this.jam,
+      required this.ganti_pakaian,
+      required this.documentId,
+      required this.status_pembayaran,
+      required this.orang,
+      required this.waktu,
+      required this.harga});
+
   @override
   _MyStepperState createState() => _MyStepperState();
 }
@@ -49,12 +110,13 @@ class _MyStepperState extends State<MyStepper> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceEvenly,
           children: [
+            _buildStepIndicator(1),
             _buildStepIndicator(2),
             _buildStepIndicator(3),
           ],
         ),
         SizedBox(height: 20),
-        _buildStepContent(_currentStep + 2),
+        _buildStepContent(_currentStep + 1),
       ],
     );
   }
@@ -62,9 +124,8 @@ class _MyStepperState extends State<MyStepper> {
   Widget _buildStepIndicator(int step) {
     return GestureDetector(
       onTap: () {
-        // Ketika step di tap, tampilkan konten sesuai dengan step yang di tap
         setState(() {
-          _currentStep = step - 2;
+          _currentStep = step - 1;
         });
       },
       child: Container(
@@ -72,7 +133,7 @@ class _MyStepperState extends State<MyStepper> {
         height: 30,
         decoration: BoxDecoration(
           shape: BoxShape.circle,
-          color: step <= _currentStep + 2 ? Color(0xFF101717) : Colors.grey,
+          color: step <= _currentStep + 1 ? Color(0xFF101717) : Colors.grey,
         ),
         child: Center(
           child: Text(
@@ -88,10 +149,56 @@ class _MyStepperState extends State<MyStepper> {
   }
 
   Widget _buildStepContent(int step) {
+    String _formatDateString(String dateString) {
+      DateTime date = DateFormat('dd-MM-yyyy').parse(dateString);
+      return DateFormat('dd MMMM yyyy').format(date);
+    }
+
     switch (step) {
       case 1:
         return Column(
-          children: [],
+          children: [
+            Text(
+              'Keterangan Jadwal Pemotretan',
+              style: GoogleFonts.roboto(
+                textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            SizedBox(height: 20),
+            Text(
+              'Jadwal Pemotretan',
+              style: GoogleFonts.roboto(
+                textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 18.0,
+                    fontWeight: FontWeight.bold),
+              ),
+            ),
+            Text(
+              '${_formatDateString(widget.tanggal)} ${widget.jam} ',
+              style: GoogleFonts.roboto(
+                textStyle: TextStyle(
+                  color: Colors.black,
+                  fontSize: 16.0,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+            SizedBox(height: 10),
+            Text(
+              'Kamu sudah bisa melakukan pemotretan. Diharapkan untuk datang ke studio 10 menit sebelum pemotretan.',
+              style: GoogleFonts.roboto(
+                textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold),
+              ),
+              textAlign: TextAlign.center,
+            ),
+          ],
         );
       case 2:
         return Column(
@@ -105,8 +212,8 @@ class _MyStepperState extends State<MyStepper> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: <Widget>[
-                  Image.asset(
-                    'images/family.jpg',
+                  Image.network(
+                    widget.gambar,
                     height: 160,
                     width: double.infinity,
                     fit: BoxFit.cover,
@@ -120,7 +227,7 @@ class _MyStepperState extends State<MyStepper> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Text(
-                              'Paket Keluarga',
+                              widget.namaPaket,
                               style: TextStyle(
                                 fontSize: 20,
                                 fontWeight: FontWeight.bold,
@@ -128,7 +235,7 @@ class _MyStepperState extends State<MyStepper> {
                               ),
                             ),
                             Text(
-                              'Belum Lunas',
+                              widget.status_pembayaran,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -147,7 +254,7 @@ class _MyStepperState extends State<MyStepper> {
                             ),
                             SizedBox(width: 4),
                             Text(
-                              '2-10 Orang People',
+                              widget.orang,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -165,7 +272,7 @@ class _MyStepperState extends State<MyStepper> {
                             ),
                             SizedBox(width: 4),
                             Text(
-                              '30 Menit',
+                              widget.waktu,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -183,7 +290,7 @@ class _MyStepperState extends State<MyStepper> {
                             ),
                             SizedBox(width: 4),
                             Text(
-                              '2x Ganti Pakaian',
+                              widget.ganti_pakaian,
                               style: TextStyle(
                                 fontSize: 14,
                                 color: Colors.white,
@@ -201,14 +308,14 @@ class _MyStepperState extends State<MyStepper> {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                Text('Status: Belum Lunas',
+                Text('Status: ${widget.status_pembayaran}',
                     style: GoogleFonts.roboto(
                       textStyle: TextStyle(
                           color: Colors.black,
                           fontSize: 20.0,
                           fontWeight: FontWeight.bold),
                     )),
-                Text('Rp.100.000',
+                Text('Rp.${widget.harga}',
                     style: GoogleFonts.roboto(
                       textStyle: TextStyle(
                           color: Colors.black,
@@ -226,39 +333,65 @@ class _MyStepperState extends State<MyStepper> {
             Row(
               mainAxisAlignment: MainAxisAlignment.start,
               children: [
-                Text('Dimohon untuk melakukan pelunasan',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                          color: Colors.black,
-                          fontSize: 14.0,
-                          fontWeight: FontWeight.bold),
-                    )
+                Text(
+                  widget.status_pembayaran == 'Belum lunas'
+                      ? 'Dimohon untuk melakukan pelunasan'
+                      : 'Diharapkan untuk menunggu editan foto',
+                  style: GoogleFonts.roboto(
+                    textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 14.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
                 ),
               ],
             ),
             SizedBox(height: 150),
             ElevatedButton(
               onPressed: () {
-                // Tambahkan logika untuk menangani tombol
-                print('Status Pembayaran Button Pressed');
+                // Check payment status
+                if (widget.status_pembayaran == 'Belum lunas') {
+                  // Show alert if payment is not completed
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Peringatan'),
+                        content: Text('Harap segera melakukan pelunasan.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context); // Close the alert
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  // Proceed to the next step if payment is completed
+                  setState(() {
+                    _currentStep = step;
+                  });
+                }
               },
               style: ElevatedButton.styleFrom(
-                primary: Color(0xFF445256), // Warna latar belakang tombol
-                onPrimary: Colors
-                    .white, // Warna teks tombol saat tombol tidak dalam keadaan ditekan
+                primary: Color(0xFF445256),
+                onPrimary: Colors.white,
                 shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(
-                      10.0), // Atur border radius sesuai keinginan
+                  borderRadius: BorderRadius.circular(10.0),
                 ),
                 side: BorderSide(
-                  color: Colors.white, // Warna border
-                  width: 2.0, // Lebar border
+                  color: Colors.white,
+                  width: 2.0,
                 ),
               ),
               child: Text(
-                'Status Pembayaran                      Belum Lunas',
+                'Status Pembayaran                      ${widget.status_pembayaran}',
                 style: TextStyle(
-                  color: Colors.white, // Warna teks tombol
+                  color: Colors.white,
                 ),
               ),
             ),
@@ -300,7 +433,8 @@ class _MyStepperState extends State<MyStepper> {
                           5.0), // Atur border radius sesuai keinginan
                     ),
                     fixedSize: Size(
-                        380, 30), // Sesuaikan lebar dan tinggi sesuai kebutuhan
+                        350, 30), // Sesuaikan lebar dan tinggi sesuai kebutuhan
+                    minimumSize: Size(0, 30), // Set minimum width and height
                   ),
                   icon: Icon(
                     CupertinoIcons.paperplane_fill,

@@ -2,15 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 void main() {
-  runApp(GantiData());
+  runApp(GantiDataBank());
 }
 
-class GantiData extends StatefulWidget {
+class GantiDataBank extends StatefulWidget {
   @override
   _GantiDataState createState() => _GantiDataState();
 }
 
-class _GantiDataState extends State<GantiData> {
+class _GantiDataState extends State<GantiDataBank> {
   String? selectedBank;
   List<String> banks = ['Bank BNI', 'Bank MANDIRI', 'Bank BCA', 'Bank BRI'];
 
@@ -27,6 +27,7 @@ class _GantiDataState extends State<GantiData> {
               color: Colors.white,
             ),
             onPressed: () {
+              Navigator.pop(context);
               // Aksi ketika tombol kembali di-klik
               // Misalnya, kembali ke layar sebelumnya
             },
@@ -71,7 +72,7 @@ class _GantiDataState extends State<GantiData> {
                   ),
                 ),
                 SizedBox(height: 20),
-               Text('Bank',
+                Text('Bank',
                     style: GoogleFonts.roboto(
                       textStyle: TextStyle(
                           color: Colors.white,
@@ -105,7 +106,7 @@ class _GantiDataState extends State<GantiData> {
                   ),
                 ),
                 SizedBox(height: 20),
-               Text('No Rekening',
+                Text('No Rekening',
                     style: GoogleFonts.roboto(
                       textStyle: TextStyle(
                           color: Colors.white,

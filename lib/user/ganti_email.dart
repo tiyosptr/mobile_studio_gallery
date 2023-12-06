@@ -19,6 +19,7 @@ class GantiData extends StatelessWidget {
               color: Colors.white,
             ),
             onPressed: () {
+              Navigator.pop(context);
               // Aksi ketika tombol kembali di-klik
               // Misalnya, kembali ke layar sebelumnya
             },
@@ -100,7 +101,7 @@ class GantiData extends StatelessWidget {
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold),
                     )),
-                     SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 TextFormField(
                   initialValue: '*******',
@@ -128,7 +129,7 @@ class GantiData extends StatelessWidget {
                           fontSize: 18.0,
                           fontWeight: FontWeight.bold),
                     )),
-                     SizedBox(height: 10),
+                SizedBox(height: 10),
 
                 TextFormField(
                   initialValue: '*******',

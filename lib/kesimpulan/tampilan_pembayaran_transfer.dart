@@ -9,12 +9,12 @@ class Pembayaran extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: PembayaranScreen(),
+      home: PembayaranScreen2(),
     );
   }
 }
 
-class PembayaranScreen extends StatelessWidget {
+class PembayaranScreen2 extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(

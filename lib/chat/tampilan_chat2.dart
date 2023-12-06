@@ -1,56 +1,42 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
-import 'package:mobile_studio_gallery/chat/chat_services.dart';
 
+void main() {
+  runApp(MaterialApp(
+    debugShowCheckedModeBanner: false,
+    home: ChatScreen(),
+  ));
+}
 class ChatScreen extends StatefulWidget {
-  final String receiverUserEmail;
-  final String receiverUserID;
-  const ChatScreen({
-    super.key,
-    required this.receiverUserEmail,
-    required this.receiverUserID,
-  });
   @override
-  State<ChatScreen> createState() => _ChatScreenState();
+  _ChatScreenState createState() => _ChatScreenState();
 }
 
 class _ChatScreenState extends State<ChatScreen> {
-  final TextEditingController _messageController = TextEditingController();
-  final ChatService _chatService = ChatService();
-  final FirebaseAuth _firebaseAuth = FirebaseAuth.instance;
-  List<ChatBubble> _messages = [];
-
-  void sendMessage() async {
-    if (_messageController.text.isNotEmpty) {
-      await _chatService.sendMessage(
-          widget.receiverUserID, _messageController.text);
-
-      setState(() {
-        _messages.add(ChatBubble(
-          message: _messageController.text,
-          isMe: true,
-          time: DateTime.now().toString(),
-        ));
-      });
-      _messageController.clear();
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
 // backgroundColor: Colors.black,
-      appBar: AppBar(title: Text("admin")),
       body: Column(
         children: [
           Expanded(
             child: ListView(
               padding: EdgeInsets.all(8.0),
-              children: _messages,
+              children: [
+                ChatBubble(
+                  message: 'Hallo Min',
+                  isMe: true,
+                  time: '10:00 AM',
+                ),
+                ChatBubble(
+                  message: 'Hallo, ad yang bisa kami bantu?',
+                  isMe: false,
+                  time: '10:05 AM',
+                ),
+                // Add more messages here
+              ],
             ),
           ),
-          ChatInput(
-              messageController: _messageController, sendMessage: sendMessage),
+          ChatInput(),
         ],
       ),
     );
@@ -103,15 +89,7 @@ class ChatBubble extends StatelessWidget {
     );
   }
 }
-
 class ChatInput extends StatelessWidget {
-  final TextEditingController messageController;
-  final VoidCallback sendMessage;
-
-  ChatInput({
-    required this.messageController,
-    required this.sendMessage,
-  });
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -121,7 +99,6 @@ class ChatInput extends StatelessWidget {
         children: [
           Expanded(
             child: TextField(
-              controller: messageController,
               decoration: InputDecoration(
                 hintText: 'Ketik Pesan...',
                 border: OutlineInputBorder(
@@ -136,7 +113,9 @@ class ChatInput extends StatelessWidget {
           ),
           SizedBox(width: 8.0),
           ElevatedButton(
-            onPressed: sendMessage,
+            onPressed: () {
+              // Handle sending the message
+            },
             child: Icon(Icons.send),
             style: ElevatedButton.styleFrom(
               primary: Colors.blue,

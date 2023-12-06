@@ -20,6 +20,8 @@ class JadwalPemotretan extends StatelessWidget {
               child: IconButton(
                 icon: Icon(Icons.arrow_back),
                 onPressed: () {
+                  // Aksi untuk kembali ke layar sebelumnya
+                  Navigator.pop(context);
                   // Tambahkan logika untuk navigasi kembali atau sesuai kebutuhan
                   print('Back button pressed');
                 },
@@ -99,7 +101,6 @@ class _MyStepperState extends State<MyStepper> {
     switch (step) {
       case 1:
         return Step1();
-
       default:
         return Container();
     }
