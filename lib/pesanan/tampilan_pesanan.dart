@@ -1,199 +1,398 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_studio_gallery/navigation/bar.dart';
-import 'package:mobile_studio_gallery/pembayaran%20DP/pembayaran_dp.dart';
+import 'package:google_fonts/google_fonts.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 
 void main() {
-  runApp(MaterialApp(
-    home: PesananPage(),
-  ));
+  runApp(PesananPage());
 }
 
 class PesananPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Pesanan',
-          style: GoogleFonts.roboto(
-            textStyle: TextStyle(
-              color: Colors.black,
-              fontSize: 24.0,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-        backgroundColor: Colors
-            .white, // Sesuaikan dengan warna latar belakang yang diinginkan
-        iconTheme:
-            IconThemeData(color: Colors.black), // Sesuaikan dengan warna ikon
-      ),
-      body: StreamBuilder<QuerySnapshot>(
-        stream: FirebaseFirestore.instance.collection('Pemesanan').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
-          }
-
-          var documents = snapshot.data!.docs;
-
-          return SingleChildScrollView(
-            child: Container(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 16),
-                    for (var document in documents)
-                      buildCardFromDocument(context, document),
-                  ],
-                ),
-              ),
-            ),
-          );
-        },
-      ),
-      bottomNavigationBar: BottomNavigation(),
+    return MaterialApp(
+      home: Pesanan(), // Ubah MyOrderScreen menjadi Pesanan
     );
   }
+}
 
-  Widget buildCardFromDocument(
-      BuildContext context, QueryDocumentSnapshot document) {
-    var data = document.data() as Map<String, dynamic>;
-    var namaPaket = data['nama_paket'];
+class Pesanan extends StatefulWidget {
+  @override
+  _PesananState createState() => _PesananState();
+}
 
-    return FutureBuilder<DocumentSnapshot>(
-      future: FirebaseFirestore.instance
-          .collection('Paket')
-          .where('nama_paket', isEqualTo: namaPaket)
-          .get()
-          .then((querySnapshot) => querySnapshot.docs.first),
-      builder: (context, paketSnapshot) {
-        if (!paketSnapshot.hasData || !paketSnapshot.data!.exists) {
-          return Container();
-        }
+class _PesananState extends State<Pesanan> {
+  List<String> ordersNotPaid = ['Paket Keluarga', 'Paket Keluarga'];
+  List<String> ordersPaid = [];
 
-        var paketData = paketSnapshot.data!.data() as Map<String, dynamic>;
-
-        return Card(
-          color: Color(0xFF101717),
-          shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(8),
+  @override
+  Widget build(BuildContext context) {
+    return DefaultTabController(
+      length: 2,
+      child: Scaffold(
+          appBar: AppBar(
+            title: Text('Pesanan'),
+            bottom: TabBar(
+              tabs: [
+                Tab(text: 'Belum Lunas'),
+                Tab(text: 'Lunas'),
+              ],
+            ),
           ),
-          clipBehavior: Clip.antiAliasWithSaveLayer,
+          body: TabBarView(
+            children: [
+              OrderList(orders: ordersNotPaid),
+              OrderList(orders: ordersPaid),
+            ],
+          ),
+          bottomNavigationBar: BottomNavigation()),
+    );
+  }
+}
+
+class OrderList extends StatelessWidget {
+  final List<String> orders;
+
+  OrderList({required this.orders});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: orders.length,
+      itemBuilder: (context, index) {
+        return OrderCard(orderName: orders[index]);
+      },
+    );
+  }
+}
+
+class OrderCard extends StatelessWidget {
+  final String orderName;
+
+  OrderCard({required this.orderName});
+
+  @override
+  Widget build(BuildContext context) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => DetailPage(orderName: orderName),
+          ),
+        );
+      },
+      child: Card(
+        color: Color(0xFF232D3F),
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(8),
+        ),
+        clipBehavior: Clip.antiAliasWithSaveLayer,
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Image.asset(
+              'images/family.jpg',
+              height: 160,
+              width: double.infinity,
+              fit: BoxFit.cover,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Text(
+                        orderName,
+                        style: TextStyle(
+                          fontSize: 20,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
+                      Text(
+                        'Belum Lunas',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                  Row(
+                    children: [
+                      Text(
+                        'Rp.200.000',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                        ),
+                      ),
+                      SizedBox(width: 219),
+                      Text(
+                        'Lihat Detail',
+                        style: TextStyle(
+                          fontSize: 14,
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}
+
+class DetailPage extends StatelessWidget {
+  final String orderName;
+
+  DetailPage({required this.orderName});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(title: Text('Detail Pesanan')),
+      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+        CarouselSlider(
+          options: CarouselOptions(
+            height: 200, // Ubah tinggi slider sesuai kebutuhan
+            viewportFraction: 1.0,
+            enlargeCenterPage: false,
+            autoPlay: true,
+          ),
+          items: [
+            'images/family.jpg',
+            'images/prewedding.jpg', // Gantilah dengan path gambar yang sesuai
+          ].map((imagePath) {
+            return Builder(
+              builder: (BuildContext context) {
+                return Image.asset(
+                  imagePath,
+                  fit: BoxFit.cover,
+                );
+              },
+            );
+          }).toList(),
+        ),
+        SizedBox(
+          height: 10,
+        ),
+        Container(
+          height: 5,
+          color: Colors.black12,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(15),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: <Widget>[
-              Image.network(
-                paketData['url_gambar'] ?? '',
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    orderName,
+                    style: TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                   Text(
+                'Belum Lunas',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
               ),
-              Padding(
-                padding: const EdgeInsets.all(15),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: <Widget>[
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Text(
-                          paketData['nama_paket'] ?? '',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                            color: Colors.white,
-                          ),
-                        ),
-                        Text(
-                          data['status_pembayaran'] ?? '',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Text(
-                          'Rp. ${paketData['harga'] ?? ''}',
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.white,
-                          ),
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment
-                          .end, // Ubah ke MainAxisAlignment.end
-                      children: [
-                        GestureDetector(
-                          onTap: () async {
-                            String namaPaket = data['nama_paket'];
-                            String status_pembayaran =
-                                data['status_pembayaran'];
-                            String waktu = paketData['waktu'];
-                            int harga = data['harga'];
-                            String orang = paketData['orang'];
-                            String gambar = paketData['url_gambar'] ?? '';
-
-                            // Check if 'tanggal' is not null before attempting to cast
-                            String tanggal = data['tanggal'] ?? '';
-
-                            String jam = data['jam'] ?? 0;
-                            String ganti_pakaian =
-                                paketData['ganti_pakaian'] ?? '';
-
-                            await Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PembayaranDP(
-                                  namaPaket: namaPaket,
-                                  gambar: gambar,
-                                  waktu: waktu,
-                                  orang: orang,
-                                  harga: harga,
-                                  status_pembayaran: status_pembayaran,
-                                  tanggal: tanggal,
-                                  jam: jam,
-                                  ganti_pakaian: ganti_pakaian,
-                                  dataPemesanan:
-                                      data, // Pass data from PemesananPage to PembayaranDP
-                                  dataPaket: paketData,
-                                  documentId: document
-                                      .id, // Pass data from PemesananPage to PembayaranDP
-                                ),
-                              ),
-                            );
-                          },
-                          child: Text(
-                            'Lihat Detail',
-                            style: TextStyle(
-                              fontSize: 14,
-                              color: Colors.white70,
-                              fontWeight: FontWeight.bold,
-                              decoration: TextDecoration.underline,
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ],
+                ],
+              ),
+              SizedBox(
+                height: 5,
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                 Text(
+                'Total Harga',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+                   Text(
+                'Rp.200.000',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+                ],
+              ),
+              Text(
+                '2-10 Orang',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                '30 Menit',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                '2x ganti pakaian',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                'Dapat Semua Foto',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Text(
+                '1 pcs 10R & Bingkai',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 14.0,
+                    fontWeight: FontWeight.bold,
+                  ),
                 ),
               ),
             ],
           ),
-        );
-      },
+        ),
+        Container(
+          height: 5,
+          color: Colors.black12,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: <Widget>[
+              Text(
+                'Informasi Lainnya',
+                style: GoogleFonts.roboto(
+                  textStyle: TextStyle(
+                    color: Colors.black,
+                    fontSize: 20.0,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Kode Pesanan',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    'K219239',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Text(
+                    'Waktu Pesanan',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                  Text(
+                    '16/12/2023 09:00',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                        color: Colors.black87,
+                        fontSize: 15.0,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ],
+          ),
+        ),
+        Container(
+          height: 5,
+          color: Colors.black12,
+        ),
+        Padding(
+          padding: const EdgeInsets.all(15),
+          child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: <Widget>[
+                Text(
+                  'Dimohon untuk melakukan pelunasan',
+                  style: GoogleFonts.roboto(
+                    textStyle: TextStyle(
+                      color: Colors.black,
+                      fontSize: 15.0,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ]),
+        )
+      ]),
     );
   }
 }

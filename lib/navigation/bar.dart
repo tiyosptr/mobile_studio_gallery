@@ -15,42 +15,51 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      backgroundColor: Colors.black,
-      currentIndex: currentIndex,
-      items: List.generate(
-        pageLabels.length,
-        (index) => BottomNavigationBarItem(
-          icon: getIcon(index),
-          label: pageLabels[index],
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xFF232D3F),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
       ),
-      onTap: (int index) {
-        setState(() {
-          currentIndex = index;
-        });
+      child: BottomNavigationBar(
+        backgroundColor: Colors.transparent,
+        currentIndex: currentIndex,
+        items: List.generate(
+          pageLabels.length,
+          (index) => BottomNavigationBarItem(
+            icon: getIcon(index),
+            label: pageLabels[index],
+          ),
+        ),
+        onTap: (int index) {
+          setState(() {
+            currentIndex = index;
+          });
 
-        switch (index) {
-          case 0:
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => PaketApp()),
-            );
-            break;
-          case 1:
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => PesananPage()),
-            );
-            break;
-          case 2:
-            Navigator.push(
-              context,
-              MaterialPageRoute(builder: (context) => Tampilan()),
-            );
-            break;
-        }
-      },
+          switch (index) {
+            case 0:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PaketApp()),
+              );
+              break;
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PesananPage()),
+              );
+              break;
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Tampilan()),
+              );
+              break;
+          }
+        },
+      ),
     );
   }
 
