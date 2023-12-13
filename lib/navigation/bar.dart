@@ -68,9 +68,10 @@ class _BottomNavigationState extends State<BottomNavigation> {
       case 0:
         return Icon(Icons.home, color: Colors.white);
       case 1:
-        return Icon(Icons.history, color: Colors.white);
+        return Icon(Icons.shopping_cart, color: Colors.white);
       case 2:
         return Icon(Icons.person, color: Colors.white);
+    
       default:
         return Icon(Icons.home, color: Colors.white);
     }

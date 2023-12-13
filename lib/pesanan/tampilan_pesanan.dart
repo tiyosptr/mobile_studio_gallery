@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:mobile_studio_gallery/navigation/bar.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:carousel_slider/carousel_slider.dart';
+import 'package:mobile_studio_gallery/navigation/bar.dart';
 
 void main() {
   runApp(PesananPage());
@@ -11,7 +10,7 @@ class PesananPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      home: Pesanan(), // Ubah MyOrderScreen menjadi Pesanan
+      home: Pesanan(),
     );
   }
 }
@@ -30,22 +29,23 @@ class _PesananState extends State<Pesanan> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-          appBar: AppBar(
-            title: Text('Pesanan'),
-            bottom: TabBar(
-              tabs: [
-                Tab(text: 'Belum Lunas'),
-                Tab(text: 'Lunas'),
-              ],
-            ),
-          ),
-          body: TabBarView(
-            children: [
-              OrderList(orders: ordersNotPaid),
-              OrderList(orders: ordersPaid),
+        appBar: AppBar(
+          title: Text('Pesanan'),
+          bottom: TabBar(
+            tabs: [
+              Tab(text: 'Belum Lunas'),
+              Tab(text: 'Lunas'),
             ],
           ),
-          bottomNavigationBar: BottomNavigation()),
+        ),
+        body: TabBarView(
+          children: [
+            OrderList(orders: ordersNotPaid),
+            OrderList(orders: ordersPaid),
+          ],
+        ),
+        bottomNavigationBar: BottomNavigation(),
+      ),
     );
   }
 }
@@ -82,71 +82,82 @@ class OrderCard extends StatelessWidget {
           ),
         );
       },
-      child: Card(
-        color: Color(0xFF232D3F),
-        shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(8),
-        ),
-        clipBehavior: Clip.antiAliasWithSaveLayer,
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            Image.asset(
-              'images/family.jpg',
-              height: 160,
-              width: double.infinity,
-              fit: BoxFit.cover,
-            ),
-            Padding(
-              padding: const EdgeInsets.all(15),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: <Widget>[
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Text(
-                        orderName,
-                        style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
-                          color: Colors.white,
-                        ),
-                      ),
-                      Text(
-                        'Belum Lunas',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
+      child: Container(
+        height: 110.0,
+        child: Card(
+          color: Color(0xFF232D3F),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(8),
+          ),
+          clipBehavior: Clip.antiAliasWithSaveLayer,
+          child: Row(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Expanded(
+                flex: 2,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(8.0),
+                  child: Image.asset(
+                    'images/family.jpg',
+                    height: 110,
+                    fit: BoxFit.cover,
                   ),
-                  Row(
-                    children: [
-                      Text(
-                        'Rp.200.000',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                        ),
-                      ),
-                      SizedBox(width: 219),
-                      Text(
-                        'Lihat Detail',
-                        style: TextStyle(
-                          fontSize: 14,
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ],
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+              SizedBox(width: 5),
+              Expanded(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      orderName,
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.bold,
+                        color: Colors.white,
+                      ),
+                    ),
+                    SizedBox(height: 8),
+                    Text(
+                      'Rp.200.000',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              SizedBox(width: 10),
+              Expanded(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'Belum Lunas',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    Text(
+                      'Lihat Detail',
+                      style: TextStyle(
+                        fontSize: 12,
+                        color: Colors.white,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -162,237 +173,171 @@ class DetailPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(title: Text('Detail Pesanan')),
-      body: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
-        CarouselSlider(
-          options: CarouselOptions(
-            height: 200, // Ubah tinggi slider sesuai kebutuhan
-            viewportFraction: 1.0,
-            enlargeCenterPage: false,
-            autoPlay: true,
+      body: Column(
+        children: [
+          Container(
+            height: 200.0,
+            child: Card(
+              color: Color(0xFF232D3F),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+              clipBehavior: Clip.antiAliasWithSaveLayer,
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Expanded(
+                    flex: 1,
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8.0),
+                      child: Image.asset(
+                        'images/family.jpg',
+                        height: 200,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ),
+                  SizedBox(width: 10),
+                  Expanded(
+                    flex: 2,
+                    child: Padding(
+                      padding: const EdgeInsets.all(0.0),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment
+                            .start, // Mengubah tata letak teks ke paling kiri
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: [
+                          Text(
+                            orderName,
+                            style: TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.person,
+                                color: Colors.white70,
+                                size: 20,
+                              ),
+                              Text(
+                                '2-10 Orang',
+                                style: GoogleFonts.roboto(
+                                  textStyle: TextStyle(
+                                      color: Colors.white70, fontSize: 14.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.access_time_filled_sharp,
+                                color: Colors.white70,
+                                size: 20,
+                              ),
+                              Text(
+                                '30 Menit',
+                                style: GoogleFonts.roboto(
+                                  textStyle: TextStyle(
+                                      color: Colors.white70, fontSize: 14.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Row(
+                            children: [
+                              Icon(
+                                Icons.layers,
+                                color: Colors.white70,
+                                size: 20,
+                              ),
+                              Text(
+                                '2x Ganti Pakaian',
+                                style: GoogleFonts.roboto(
+                                  textStyle: TextStyle(
+                                      color: Colors.white70, fontSize: 14.0),
+                                ),
+                              ),
+                            ],
+                          ),
+                          SizedBox(
+                            height: 5,
+                          ),
+                          Text(
+                            'Tanggal Pemotretan : 3 Agustus 2023',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Jam Pemotretan : 17.00 - 17.30',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Harga Paket Foto : 200.000',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                          SizedBox(height: 5),
+                          Text(
+                            'Metode Pembayaran : Pembayaran Didepan',
+                            style: TextStyle(
+                              fontSize: 12,
+                              color: Colors.white70,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
           ),
-          items: [
-            'images/family.jpg',
-            'images/prewedding.jpg', // Gantilah dengan path gambar yang sesuai
-          ].map((imagePath) {
-            return Builder(
-              builder: (BuildContext context) {
-                return Image.asset(
-                  imagePath,
-                  fit: BoxFit.cover,
-                );
-              },
-            );
-          }).toList(),
-        ),
-        SizedBox(
-          height: 10,
-        ),
-        Container(
-          height: 5,
-          color: Colors.black12,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    orderName,
-                    style: TextStyle(
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                   Text(
-                'Belum Lunas',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
+
+          SizedBox(height: 300),
+          Text(
+            '* Setelah melakukan pemotretan, mohon melunasi pembayaran',
+            style: TextStyle(
+              fontSize: 13,
+              color: Colors.red,
+            ),
+          ), // Spasi antara Card dan Button
+           ElevatedButton(
+            onPressed: () {
+              // Aksi yang dijalankan ketika tombol ditekan
+              // Misalnya, Anda dapat menambahkan logika untuk melakukan pembayaran di sini
+            },
+            style: ElevatedButton.styleFrom(
+              primary: Color(0xFF232D3F), // Warna background button
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(5), // Border radius button
               ),
-                ],
-              ),
-              SizedBox(
-                height: 5,
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                 Text(
-                'Total Harga',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-                   Text(
-                'Rp.200.000',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-                ],
-              ),
-              Text(
-                '2-10 Orang',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text(
-                '30 Menit',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text(
-                '2x ganti pakaian',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text(
-                'Dapat Semua Foto',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Text(
-                '1 pcs 10R & Bingkai',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-            ],
+            ),
+            child: Text(
+              'Status Pembayaran                       Belum Lunas',
+              style: TextStyle(color: Colors.white), // Warna teks putih
+            ),
           ),
-        ),
-        Container(
-          height: 5,
-          color: Colors.black12,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: <Widget>[
-              Text(
-                'Informasi Lainnya',
-                style: GoogleFonts.roboto(
-                  textStyle: TextStyle(
-                    color: Colors.black,
-                    fontSize: 20.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Kode Pesanan',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    'K219239',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Text(
-                    'Waktu Pesanan',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                  Text(
-                    '16/12/2023 09:00',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: Colors.black87,
-                        fontSize: 15.0,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            ],
-          ),
-        ),
-        Container(
-          height: 5,
-          color: Colors.black12,
-        ),
-        Padding(
-          padding: const EdgeInsets.all(15),
-          child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: <Widget>[
-                Text(
-                  'Dimohon untuk melakukan pelunasan',
-                  style: GoogleFonts.roboto(
-                    textStyle: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15.0,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ),
-              ]),
-        )
-      ]),
+        ],
+      ),
     );
   }
 }
