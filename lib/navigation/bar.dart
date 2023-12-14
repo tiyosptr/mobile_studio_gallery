@@ -15,21 +15,30 @@ class _BottomNavigationState extends State<BottomNavigation> {
 
   @override
   Widget build(BuildContext context) {
-    return BottomNavigationBar(
-      backgroundColor: Colors.black,
-      currentIndex: currentIndex,
-      items: List.generate(
-        pageLabels.length,
-        (index) => BottomNavigationBarItem(
-          icon: getIcon(index),
-          label: pageLabels[index],
+    return Container(
+      decoration: BoxDecoration(
+        color: Color(0xFF232D3F),
+        borderRadius: BorderRadius.only(
+          topLeft: Radius.circular(20),
+          topRight: Radius.circular(20),
         ),
       ),
-      onTap: (int index) {
-        setState(() {
-          currentIndex = index;
-        });
+      child: BottomNavigationBar(
+        backgroundColor: Colors.transparent,
+        currentIndex: currentIndex,
+        items: List.generate(
+          pageLabels.length,
+          (index) => BottomNavigationBarItem(
+            icon: getIcon(index),
+            label: pageLabels[index],
+          ),
+        ),
+        onTap: (int index) {
+          setState(() {
+            currentIndex = index;
+          });
 
+<<<<<<< HEAD
         switch (index) {
           case 0:
             Navigator.push(
@@ -51,6 +60,30 @@ class _BottomNavigationState extends State<BottomNavigation> {
             break;
         }
       },
+=======
+          switch (index) {
+            case 0:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PaketApp()),
+              );
+              break;
+            case 1:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PesananPage()),
+              );
+              break;
+            case 2:
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Tampilan()),
+              );
+              break;
+          }
+        },
+      ),
+>>>>>>> ac14ea2eebc35201c199b47cbcb7282cfbd8f15e
     );
   }
 
@@ -59,9 +92,10 @@ class _BottomNavigationState extends State<BottomNavigation> {
       case 0:
         return Icon(Icons.home, color: Colors.white);
       case 1:
-        return Icon(Icons.history, color: Colors.white);
+        return Icon(Icons.shopping_cart, color: Colors.white);
       case 2:
         return Icon(Icons.person, color: Colors.white);
+    
       default:
         return Icon(Icons.home, color: Colors.white);
     }
