@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:intl/intl.dart';
 import 'package:mobile_studio_gallery/navigation/bar.dart';
 import 'package:mobile_studio_gallery/pembayaran%20DP/pembayaran_dp.dart';
-
-void main() {
-  runApp(MaterialApp(
-    home: PesananPage(),
-  ));
-}
 
 class PesananPage extends StatelessWidget {
   @override
@@ -25,36 +20,30 @@ class PesananPage extends StatelessWidget {
             ),
           ),
         ),
-        backgroundColor: Colors
-            .white, // Sesuaikan dengan warna latar belakang yang diinginkan
-        iconTheme:
-            IconThemeData(color: Colors.black), // Sesuaikan dengan warna ikon
+        backgroundColor: Colors.white,
+        iconTheme: IconThemeData(color: Colors.black),
       ),
       body: StreamBuilder<QuerySnapshot>(
         stream: FirebaseFirestore.instance.collection('Pemesanan').snapshots(),
-        builder: (context, snapshot) {
-          if (!snapshot.hasData) {
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+        builder: (BuildContext context, AsyncSnapshot<QuerySnapshot> snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return Center(child: CircularProgressIndicator());
+          }
+          if (snapshot.hasError) {
+            return Center(child: Text('Terjadi error: ${snapshot.error}'));
           }
 
           var documents = snapshot.data!.docs;
 
-          return SingleChildScrollView(
-            child: Container(
-              child: Padding(
-                padding: const EdgeInsets.all(16.0),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    SizedBox(height: 16),
-                    for (var document in documents)
-                      buildCardFromDocument(context, document),
-                  ],
-                ),
-              ),
-            ),
+          // Sort documents based on documentId
+          documents.sort((a, b) => b.id.compareTo(a.id));
+
+          return ListView.builder(
+            itemCount: documents.length,
+            itemBuilder: (context, index) {
+              var document = documents[index];
+              return buildCardFromDocument(context, document);
+            },
           );
         },
       ),
@@ -124,7 +113,7 @@ class PesananPage extends StatelessWidget {
                     Row(
                       children: [
                         Text(
-                          'Rp. ${paketData['harga'] ?? ''}',
+                          'Rp. ${data['harga'] ?? ''}',
                           style: TextStyle(
                             fontSize: 14,
                             color: Colors.white,

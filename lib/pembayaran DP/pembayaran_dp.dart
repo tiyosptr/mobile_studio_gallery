@@ -35,10 +35,8 @@ class PembayaranDP extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
+      debugShowCheckedModeBanner: false,
       home: Scaffold(
-        appBar: AppBar(
-          title: Text('Detail Pembayaran'),
-        ),
         body: Stack(
           children: [
             MyStepper(
@@ -197,6 +195,53 @@ class _MyStepperState extends State<MyStepper> {
                     fontWeight: FontWeight.bold),
               ),
               textAlign: TextAlign.center,
+            ),
+            ElevatedButton(
+              onPressed: () {
+                // Check payment status
+                if (widget.status_pembayaran == 'Belum lunas') {
+                  // Show alert if payment is not completed
+                  showDialog(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: Text('Peringatan'),
+                        content: Text('Harap segera melakukan pelunasan.'),
+                        actions: [
+                          TextButton(
+                            onPressed: () {
+                              Navigator.pop(context); // Close the alert
+                            },
+                            child: Text('OK'),
+                          ),
+                        ],
+                      );
+                    },
+                  );
+                } else {
+                  // Proceed to the next step if payment is completed
+                  setState(() {
+                    _currentStep = step;
+                  });
+                }
+              },
+              style: ElevatedButton.styleFrom(
+                primary: Color(0xFF445256),
+                onPrimary: Colors.white,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                side: BorderSide(
+                  color: Colors.white,
+                  width: 2.0,
+                ),
+              ),
+              child: Text(
+                'Status Pembayaran                      ${widget.status_pembayaran}',
+                style: TextStyle(
+                  color: Colors.white,
+                ),
+              ),
             ),
           ],
         );

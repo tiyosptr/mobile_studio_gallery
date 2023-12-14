@@ -1,11 +1,13 @@
 import 'package:flutter/material.dart';
-
+import 'dart:convert';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran3.dart';
+import 'package:mobile_studio_gallery/utils/privacyPolicyPage.dart';
 import 'package:mobile_studio_gallery/utils/showSnackbar.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:crypto/crypto.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -39,6 +41,33 @@ class _RegistrationPage extends State<RegistrationPage2> {
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _ulangiPasswordController =
       TextEditingController();
+
+  bool _isChecked = false;
+
+  bool validateFields() {
+    if (_namaLengkapController.text.isEmpty ||
+        _emailController.text.isEmpty ||
+        _namaPenggunaController.text.isEmpty ||
+        _passwordController.text.isEmpty ||
+        _ulangiPasswordController.text.isEmpty) {
+      showSnackBar(context, "Semua kolom harus diisi");
+      return false;
+    } else if (!isValidEmail(_emailController.text)) {
+      showSnackBar(context, "Masukkan alamat email yang valid");
+      return false;
+    } else if (!passwordConfirmed()) {
+      showSnackBar(context, "Kata sandi tidak sesuai");
+      return false;
+    }
+    return true;
+  }
+
+  bool isValidEmail(String email) {
+    // General email regex pattern
+    return RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
+        .hasMatch(email);
+  }
+
   @override
   void dispose() {
     _namaLengkapController.dispose();
@@ -50,29 +79,62 @@ class _RegistrationPage extends State<RegistrationPage2> {
   }
 
   //signUp
+
   Future signUp() async {
     if (passwordConfirmed()) {
       final auth = FirebaseAuth.instance;
-      auth.createUserWithEmailAndPassword(
-        email: _emailController.text,
-        password: _passwordController.text,
-      );
-      //add user details
-      addUser(_namaLengkapController.text, _emailController.text,
-          _namaPenggunaController.text);
+      try {
+        UserCredential userCredential =
+            await auth.createUserWithEmailAndPassword(
+          email: _emailController.text,
+          password: _passwordController.text,
+        );
+
+        String uid = userCredential.user?.uid ?? "";
+
+        String hashedPassword = hashPassword(_passwordController.text);
+
+        addUser(
+          _namaLengkapController.text,
+          _emailController.text,
+          _namaPenggunaController.text,
+          hashedPassword,
+          uid,
+        );
+
+        showSnackBar(
+          context,
+          "Pendaftaran berhasil!",
+        );
+      } on FirebaseAuthException catch (e) {
+        print("Error: $e");
+        showSnackBar(
+          context,
+          "Pendaftaran gagal. ${e.message}",
+        );
+      }
+    } else {
       showSnackBar(
         context,
-        "Pendaftaran berhasil!",
+        "Pastikan Anda telah menyetujui Kebijakan Privasi dan Persyaratan Layanan.",
       );
     }
   }
 
+  String hashPassword(String password) {
+    var bytes = utf8.encode(password);
+    var digest = sha256.convert(bytes);
+    return digest.toString();
+  }
+
   //nyimpan userdetail
-  Future addUser(String namaLengkap, String email, String namaPengguna) async {
+  Future addUser(String namaLengkap, String email, String namaPengguna,
+      String password, String uid) async {
     await FirebaseFirestore.instance.collection('users').add({
-      'nama lengkap': namaLengkap,
+      'nama_lengkap': namaLengkap,
       'email': email,
-      'nama pengguna': namaPengguna,
+      'nama_pengguna': namaPengguna,
+      'password': password,
     });
   }
 
@@ -288,6 +350,35 @@ class _RegistrationPage extends State<RegistrationPage2> {
                           ),
                         ],
                       ),
+                      const SizedBox(height: 20.0),
+                      Row(
+                        children: [
+                          Checkbox(
+                            value: _isChecked,
+                            onChanged: (bool? value) {
+                              setState(() {
+                                _isChecked = value!;
+                              });
+                            },
+                          ),
+                          InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                    builder: (context) => PrivacyPolicyPage()),
+                              );
+                            },
+                            child: Text(
+                              'Baca Kebijakan privasi dan persyaratan layanan',
+                              style: TextStyle(
+                                color: Colors.blue,
+                                decoration: TextDecoration.underline,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
                     ],
                   ),
                 ),
@@ -300,28 +391,14 @@ class _RegistrationPage extends State<RegistrationPage2> {
                 const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
             child: ElevatedButton(
               onPressed: () async {
-                await signUp();
-                Navigator.of(context).push(
-                  PageRouteBuilder(
-                    pageBuilder: (context, animation, secondaryAnimation) {
-                      return RegistrationPage3(); // Gantilah dengan halaman kedua yang ingin Anda tampilkan
-                    },
-                    transitionsBuilder:
-                        (context, animation, secondaryAnimation, child) {
-                      const begin =
-                          Offset(7.0, 0.0); // Mulai dari kanan ke kiri
-                      const end = Offset.zero; // Berakhir di posisi awal
-                      const curve = Curves.easeOutCubic; // Kurva animasi
-                      var tween = Tween(begin: begin, end: end)
-                          .chain(CurveTween(curve: curve));
-                      var offsetAnimation = animation.drive(tween);
-                      return SlideTransition(
-                        position: offsetAnimation,
-                        child: child, // Halaman yang akan ditampilkan
-                      );
-                    },
-                  ),
-                );
+                if (validateFields()) {
+                  await signUp();
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => RegistrationPage3()),
+                  );
+                }
               },
               style: ButtonStyle(
                 backgroundColor: MaterialStateProperty.all<Color>(Colors.black),
@@ -336,7 +413,7 @@ class _RegistrationPage extends State<RegistrationPage2> {
                 width: double.infinity,
                 child: Center(
                   child: Text(
-                    'Selanjutnya',
+                    'Daftar Sekarang',
                     style: TextStyle(
                       color: Colors.white,
                     ),

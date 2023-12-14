@@ -1,14 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:video_player/video_player.dart';
 
-void main() {
-  runApp(MyApp());
-}
+void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Splash Screen Example',
       home: SplashScreen(),
     );
   }
@@ -20,43 +18,59 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  late VideoPlayerController _controller;
+  bool _isVideoInitialized = false;
+
   @override
   void initState() {
     super.initState();
-    // Simulasi waktu tunda untuk splash screen (contoh: 3 detik)
-    Future.delayed(Duration(seconds: 5), () {
-      // Pindah ke halaman berikutnya setelah splash screen
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+    _controller = VideoPlayerController.asset('videos/m_letter.mp4')
+      ..initialize().then((_) {
+        setState(() {
+          _isVideoInitialized = true;
+        });
+        _controller.play();
+      });
+
+    _controller.addListener(() {
+      if (_controller.value.position == _controller.value.duration) {
+        // Navigasi ke halaman berikutnya setelah video selesai
+        Navigator.of(context).pushReplacement(
+          MaterialPageRoute(builder: (context) => HomeScreen()),
+        );
+      }
     });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Center(
-        child: Image.asset(
-          'images/prewedding.jpg',
-          fit: BoxFit.cover,
-          width: MediaQuery.of(context).size.width,
-          height: MediaQuery.of(context).size.height,
-        ),
-      ),
+      body: _isVideoInitialized
+          ? Stack(
+              children: [Center(child: VideoPlayer(_controller))],
+            )
+          : Center(
+              child: CircularProgressIndicator(),
+            ),
     );
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
   }
 }
 
-class HomePage extends StatelessWidget {
+class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Home Page'),
+        title: Text('Aplikasi Utama'),
       ),
       body: Center(
-        child: Text('Selamat datang di Aplikasi Flutter!'),
+        child: Text('Halaman Utama'),
       ),
     );
   }

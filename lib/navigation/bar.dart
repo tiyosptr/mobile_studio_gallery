@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 import 'package:mobile_studio_gallery/user/data_pribadi.dart';
-import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan.dart';
+import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan_new.dart';
 
 class BottomNavigation extends StatefulWidget {
   @override
@@ -40,7 +40,7 @@ class _BottomNavigationState extends State<BottomNavigation> {
           case 1:
             Navigator.push(
               context,
-              MaterialPageRoute(builder: (context) => PesananPage()),
+              MaterialPageRoute(builder: (context) => PesananPage2()),
             );
             break;
           case 2:

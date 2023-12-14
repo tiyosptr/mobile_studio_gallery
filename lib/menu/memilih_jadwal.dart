@@ -212,6 +212,23 @@ class _CalendarScreenState extends State<CalendarScreen> {
     }
   }
 
+  Future<bool> checkTimeAvailability(
+      String selectedDate, String selectedTime) async {
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    CollectionReference bookingCollection = firestore.collection('Pemesanan');
+
+    // Menggabungkan tanggal dan waktu menjadi format yang sesuai
+    String selectedDateTime = '$selectedDate $selectedTime';
+
+    // Melakukan query ke Firestore untuk mencari waktu yang cocok
+    QuerySnapshot querySnapshot = await bookingCollection
+        .where('tanggal', isEqualTo: selectedDateTime)
+        .get();
+
+    // Mengembalikan true jika waktu tersedia, false jika sudah diisi
+    return querySnapshot.docs.isEmpty;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -223,6 +240,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
               mainAxisAlignment: MainAxisAlignment
                   .start, // Mengatur tata letak dari kiri ke kanan
               children: [
+                SizedBox(width: 15),
                 // Ikon panah kembali dengan Navigator
                 GestureDetector(
                   onTap: () {
@@ -266,7 +284,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                 calendarFormat: _calendarFormat,
                 focusedDay: _focusedDay,
                 firstDay: DateTime.now(),
-                lastDay: DateTime.utc(2024, 12, 31),
+                lastDay: DateTime.utc(2025, 12, 31),
                 selectedDayPredicate: (day) {
                   return isSameDay(_selectedDay, day);
                 },
@@ -296,8 +314,8 @@ class _CalendarScreenState extends State<CalendarScreen> {
                     color: Colors.black, // Warna teks saat tanggal dipilih
                   ),
                   selectedDecoration: BoxDecoration(
-                    color: Colors
-                        .white70, // Set color for selected date in dark theme
+                    color: Colors.green[
+                        700], // Set color for selected date in dark theme
                     shape: BoxShape.rectangle,
                   ),
                   selectedTextStyle: TextStyle(
@@ -443,7 +461,7 @@ class _CalendarScreenState extends State<CalendarScreen> {
                                 height: 150.0,
                                 child: Card(
                                   color: isSelected
-                                      ? Colors.blue[100]
+                                      ? Colors.green
                                       : Color(0xFF445256),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5.0),
@@ -521,42 +539,44 @@ class _CalendarScreenState extends State<CalendarScreen> {
       bottomNavigationBar: Container(
         padding: EdgeInsets.symmetric(horizontal: 20),
         child: ElevatedButton(
-          onPressed: () {
+          onPressed: () async {
             if (_selectedTime.isNotEmpty) {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => SelectStudio(
-                    paket: widget.paket,
-                    docId: widget.docId,
-                    selectedStudioIndex: widget.studioIndex,
-                    selectedDate: _selectedDate,
-                    selectedTime: _selectedTime,
+              // Lakukan pengecekan di Firestore sebelum menavigasi
+              bool isTimeAvailable =
+                  await checkTimeAvailability(_selectedDate, _selectedTime);
+
+              if (isTimeAvailable) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => SelectStudio(
+                      paket: widget.paket,
+                      docId: widget.docId,
+                      selectedStudioIndex: widget.studioIndex,
+                      selectedDate: _selectedDate,
+                      selectedTime: _selectedTime,
+                    ),
                   ),
-                ),
-              );
+                );
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(
+                    content: Text('Jam sudah dipilih. Silahkan pilih jam lain'),
+                    duration: Duration(seconds: 2),
+                  ),
+                );
+              }
             } else {
-              showDialog(
-                context: context,
-                builder: (BuildContext context) {
-                  return AlertDialog(
-                    title: Text('Oops!'),
-                    content: Text('Harap pilih jadwal terlebih dahulu.'),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop();
-                        },
-                        child: Text('OK'),
-                      ),
-                    ],
-                  );
-                },
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text('Harap pilih jadwal terlebih dahulu.'),
+                  duration: Duration(seconds: 2),
+                ),
               );
             }
           },
           style: ElevatedButton.styleFrom(
-            primary: Color(0xFF445256),
+            primary: _selectedTime.isNotEmpty ? Color(0xFF445256) : Colors.grey,
             shape: RoundedRectangleBorder(
               borderRadius: BorderRadius.circular(5.0),
             ),
@@ -567,7 +587,9 @@ class _CalendarScreenState extends State<CalendarScreen> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  'Pesan Sekarang',
+                  _selectedTime.isNotEmpty
+                      ? 'Pesan Sekarang'
+                      : 'Pilih jam dahulu',
                   style: TextStyle(
                     color: Colors.white,
                     fontSize: 16.0,

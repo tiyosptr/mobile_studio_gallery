@@ -49,6 +49,8 @@ dependencies:
   firebase_database: ^10.3.6
   intl: ^0.18.1
   firebase_app_check: ^0.2.1+6
+  video_player: ^2.8.1
+  file_picker: ^6.1.1
 
 dev_dependencies:
   flutter_lints: ^2.0.0
@@ -80,6 +82,7 @@ flutter:
     - images/studio2.png
     - images/studio3.png
     - images/studio4.png
+    - videos/m_letter.mp4
 
     # - images/foto.jpeg
   # An image asset can refer to one or more resolution-specific "variants", see

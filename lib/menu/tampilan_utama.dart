@@ -3,6 +3,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_studio_gallery/chat/tampilan_chat.dart';
 import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_studio_gallery/navigation/bar.dart';
@@ -35,12 +36,32 @@ class _HomePageState extends State<HomePage> {
   late QuerySnapshot querySnapshot; // Tambahkan variabel ini
   bool isLoading = true; // Tambahkan variabel isLoading
   bool showTambahDataButton = false;
+  late User _currentUser;
 
   @override
   void initState() {
     super.initState();
+    if (FirebaseAuth.instance.currentUser != null) {
+      _currentUser = FirebaseAuth.instance.currentUser!;
+    } else {
+      // Handle the case where the user is not authenticated
+      // You can display a login screen or handle it as needed
+    }
     paketList = [];
     getPaketList();
+  }
+
+  Future<DocumentSnapshot> getUserData() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: _currentUser.email)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first;
+    } else {
+      return FirebaseFirestore.instance.collection('users').doc().get();
+    }
   }
 
   void getPaketList() {
@@ -86,317 +107,326 @@ class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        backgroundColor: const Color.fromARGB(255, 255, 255, 255),
-        body: Column(
-          children: [
-            if (isLoading) // Tambahkan kondisi untuk menampilkan CircularProgressIndicator
-              Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
+      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      body: Column(
+        children: [
+          if (isLoading) // Tambahkan kondisi untuk menampilkan CircularProgressIndicator
+            Expanded(
+              child: Center(
+                child: CircularProgressIndicator(),
               ),
-            if (!isLoading && paketList.isEmpty)
-              Expanded(
-                child: Center(
-                  child: Text('Data Kosong'),
-                ),
+            ),
+          if (!isLoading && paketList.isEmpty)
+            Expanded(
+              child: Center(
+                child: Text('Data Kosong'),
               ),
-            if (!isLoading && paketList.isNotEmpty)
-              Stack(
-                alignment: Alignment.topCenter,
-                children: [
-                  StreamBuilder<QuerySnapshot>(
-                    stream: FirebaseFirestore.instance
-                        .collection('Paket')
-                        .snapshots(),
-                    builder: (context, snapshot) {
-                      if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
-                        List<String> imageUrls = [];
-                        snapshot.data!.docs.forEach((doc) {
-                          if (doc['url_gambar'] != null) {
-                            imageUrls.add(doc['url_gambar']);
-                          }
-                        });
-                        if (imageUrls.isNotEmpty) {
-                          return CarouselSlider(
-                            items: imageUrls.map((imageUrl) {
-                              return Image.network(
-                                imageUrl,
-                                fit: BoxFit.cover,
-                              );
-                            }).toList(),
-                            options: CarouselOptions(
-                              autoPlay: true,
-                              height: 380.0,
-                              viewportFraction: 1,
-                              disableCenter: true,
-                              autoPlayInterval: Duration(seconds: 4),
-                              autoPlayAnimationDuration:
-                                  Duration(milliseconds: 800),
-                              onPageChanged: (index, reason) {
-                                setState(() {});
-                              },
-                            ),
-                          );
-                        } else {
-                          return Center(child: Text('Gambar Tidak Tersedia'));
+            ),
+          if (!isLoading && paketList.isNotEmpty)
+            Stack(
+              alignment: Alignment.topCenter,
+              children: [
+                StreamBuilder<QuerySnapshot>(
+                  stream: FirebaseFirestore.instance
+                      .collection('Promosi')
+                      .snapshots(),
+                  builder: (context, snapshot) {
+                    if (snapshot.hasData && snapshot.data!.docs.isNotEmpty) {
+                      List<String> imageUrls = [];
+                      snapshot.data!.docs.forEach((doc) {
+                        if (doc['promoImage'] != null) {
+                          imageUrls.add(doc['promoImage']);
                         }
+                      });
+                      if (imageUrls.isNotEmpty) {
+                        return CarouselSlider(
+                          items: imageUrls.map((imageUrl) {
+                            return Image.network(
+                              imageUrl,
+                              fit: BoxFit.cover,
+                            );
+                          }).toList(),
+                          options: CarouselOptions(
+                            autoPlay: true,
+                            height: 380.0,
+                            viewportFraction: 1,
+                            disableCenter: true,
+                            autoPlayInterval: Duration(seconds: 4),
+                            autoPlayAnimationDuration:
+                                Duration(milliseconds: 800),
+                            onPageChanged: (index, reason) {
+                              setState(() {});
+                            },
+                          ),
+                        );
+                      } else {
+                        return Center(child: Text('Gambar Tidak Tersedia'));
+                      }
+                    } else if (snapshot.hasError) {
+                      return Text('Error: ${snapshot.error}');
+                    } else {
+                      return Center(child: CircularProgressIndicator());
+                    }
+                  },
+                ),
+                Positioned(
+                  top: 50.0,
+                  left: 20.0,
+                  child: Text(
+                    'Selamat Datang',
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4.0,
+                            color: Colors.black,
+                            offset: Offset(2.0, 2.0),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ),
+                ),
+                Positioned(
+                  top: 80.0,
+                  left: 20.0,
+                  child: FutureBuilder<DocumentSnapshot>(
+                    future: getUserData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
                       } else if (snapshot.hasError) {
                         return Text('Error: ${snapshot.error}');
                       } else {
-                        return Center(child: CircularProgressIndicator());
-                      }
-                    },
-                  ),
-                  Positioned(
-                    top: 50.0,
-                    left: 20.0,
-                    child: Text(
-                      'Selamat Datang',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 4.0,
-                              color: Colors.black,
-                              offset: Offset(2.0, 2.0),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                  Positioned(
-                    top: 80.0,
-                    left: 20.0,
-                    child: Text(
-                      'User',
-                      style: GoogleFonts.poppins(
-                        textStyle: TextStyle(
-                          color: Colors.white,
-                          fontSize: 20.0,
-                          shadows: [
-                            Shadow(
-                              blurRadius: 4.0,
-                              color: Colors.black,
-                              offset: Offset(2.0, 2.0),
-                            ),
-                          ],
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-            SizedBox(height: 10),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Padding(
-                  padding: const EdgeInsets.only(left: 15.0),
-                  child: Text(
-                    'PAKET KAMI:',
-                    style: GoogleFonts.roboto(
-                      textStyle: TextStyle(
-                        color: const Color.fromARGB(255, 0, 0, 0),
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                      ),
-                    ),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-              ],
-            ),
-            if (isLoading) // Tampilkan indikator loading jika isLoading adalah true
-              Expanded(
-                child: Center(
-                  child: CircularProgressIndicator(),
-                ),
-              ),
-            if (!isLoading &&
-                paketList
-                    .isNotEmpty) // Tampilkan data jika isLoading adalah false
-              Expanded(
-                child: ListView.builder(
-                  shrinkWrap: true,
-                  itemCount: paketList.length,
-                  itemBuilder: (context, index) {
-                    final paket = paketList[index];
-                    final namaPaket = paket['nama_paket'];
-                    final orang = paket['orang'];
-                    final waktu = paket['waktu'];
-                    final keuntungan1 = paket['keuntungan1'];
-                    final harga = paket['harga'];
-                    final imageUrl = paket['url_gambar'];
-
-                    return Padding(
-                      padding: const EdgeInsets.only(
-                          left: 24, right: 24, top: 5, bottom: 16),
-                      child: InkWell(
-                        splashColor: Colors.transparent,
-                        onTap: () {
-                          _navigateToDetailPage(paket);
-                        },
-                        child: Container(
-                          decoration: BoxDecoration(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16.0)),
-                            boxShadow: <BoxShadow>[
-                              BoxShadow(
-                                color: Colors.grey.withOpacity(0.6),
-                                offset: const Offset(4, 4),
-                                blurRadius: 16,
-                              ),
-                            ],
-                          ),
-                          child: ClipRRect(
-                            borderRadius:
-                                const BorderRadius.all(Radius.circular(16.0)),
-                            child: Stack(
-                              children: <Widget>[
-                                Column(
-                                  children: <Widget>[
-                                    Image.network(
-                                      imageUrl ?? '',
-                                      fit: BoxFit.cover,
-                                      width: double.infinity,
-                                      height: 150.0,
-                                    ),
-                                    Container(
-                                      color: Colors.black,
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: <Widget>[
-                                          Expanded(
-                                            child: Container(
-                                              child: Padding(
-                                                padding: const EdgeInsets.only(
-                                                    left: 16,
-                                                    top: 8,
-                                                    bottom: 8),
-                                                child: Column(
-                                                  mainAxisAlignment:
-                                                      MainAxisAlignment.center,
-                                                  crossAxisAlignment:
-                                                      CrossAxisAlignment.start,
-                                                  children: <Widget>[
-                                                    Text(
-                                                      namaPaket ?? '',
-                                                      textAlign: TextAlign.left,
-                                                      style: TextStyle(
-                                                        decoration:
-                                                            TextDecoration
-                                                                .underline,
-                                                        decorationThickness:
-                                                            2.0,
-                                                        fontWeight:
-                                                            FontWeight.w600,
-                                                        fontSize: 22,
-                                                        color: Colors.white,
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      orang ?? '',
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white
-                                                            .withOpacity(1.0),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      waktu ?? '',
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white
-                                                            .withOpacity(1.0),
-                                                      ),
-                                                    ),
-                                                    Text(
-                                                      keuntungan1 ?? '',
-                                                      style: TextStyle(
-                                                        fontSize: 14,
-                                                        color: Colors.white
-                                                            .withOpacity(1.0),
-                                                      ),
-                                                    ),
-                                                  ],
-                                                ),
-                                              ),
-                                            ),
-                                          ),
-                                          Padding(
-                                            padding: const EdgeInsets.only(
-                                                right: 16, top: 8),
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.end,
-                                              children: <Widget>[
-                                                Text(
-                                                  'RP ${harga ?? ''}',
-                                                  textAlign: TextAlign.left,
-                                                  style: TextStyle(
-                                                    decoration: TextDecoration
-                                                        .underline,
-                                                    decorationThickness: 2.0,
-                                                    fontWeight: FontWeight.w600,
-                                                    fontSize: 21,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ],
+                        String userName =
+                            snapshot.data?.get('nama_pengguna') ?? 'User';
+                        return Text(
+                          userName,
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.0,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 4.0,
+                                  color: Colors.black,
+                                  offset: Offset(2.0, 2.0),
                                 ),
                               ],
                             ),
                           ),
-                        ),
-                      ),
-                    );
-                  },
+                        );
+                      }
+                    },
+                  ),
+                ),
+              ],
+            ),
+          SizedBox(height: 10),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Padding(
+                padding: const EdgeInsets.only(left: 15.0),
+                child: Text(
+                  'PAKET KAMI:',
+                  style: GoogleFonts.roboto(
+                    textStyle: TextStyle(
+                      color: const Color.fromARGB(255, 0, 0, 0),
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                  textAlign: TextAlign.center,
                 ),
               ),
-          ],
-        ),
-        floatingActionButton: Padding(
-          padding: EdgeInsets.fromLTRB(0, 120, 0, 52),
-          child: Align(
-            alignment: Alignment.topRight,
-            child: FloatingActionButton(
-              onPressed: () {
-                // Navigasi ke halaman Obrolan
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                      builder: (context) => ChatScreen(
-                            receiverUserEmail: '',
-                            receiverUserID: '',
-                          )),
-                );
-              },
-              child: const Icon(Icons.chat),
-              backgroundColor:
-                  const Color.fromARGB(255, 81, 85, 81).withOpacity(0.3),
-              elevation: 2,
-              shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(12)),
+            ],
+          ),
+          if (isLoading) // Tampilkan indikator loading jika isLoading adalah true
+            Expanded(
+              child: Center(
+                child: CircularProgressIndicator(),
+              ),
             ),
+          if (!isLoading &&
+              paketList
+                  .isNotEmpty) // Tampilkan data jika isLoading adalah false
+            Expanded(
+              child: ListView.builder(
+                shrinkWrap: true,
+                itemCount: paketList.length,
+                itemBuilder: (context, index) {
+                  final paket = paketList[index];
+                  final namaPaket = paket['nama_paket'];
+                  final orang = paket['orang'];
+                  final waktu = paket['waktu'];
+                  final keuntungan1 = paket['keuntungan1'];
+                  final harga = paket['harga'];
+                  final imageUrl = paket['url_gambar'];
+
+                  return Padding(
+                    padding: const EdgeInsets.only(
+                        left: 24, right: 24, top: 5, bottom: 16),
+                    child: InkWell(
+                      splashColor: Colors.transparent,
+                      onTap: () {
+                        _navigateToDetailPage(paket);
+                      },
+                      child: Container(
+                        decoration: BoxDecoration(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(16.0)),
+                          boxShadow: <BoxShadow>[
+                            BoxShadow(
+                              color: Colors.grey.withOpacity(0.6),
+                              offset: const Offset(4, 4),
+                              blurRadius: 16,
+                            ),
+                          ],
+                        ),
+                        child: ClipRRect(
+                          borderRadius:
+                              const BorderRadius.all(Radius.circular(16.0)),
+                          child: Stack(
+                            children: <Widget>[
+                              Column(
+                                children: <Widget>[
+                                  Image.network(
+                                    imageUrl ?? '',
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                    height: 150.0,
+                                  ),
+                                  Container(
+                                    color: Colors.black,
+                                    child: Row(
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: <Widget>[
+                                        Expanded(
+                                          child: Container(
+                                            child: Padding(
+                                              padding: const EdgeInsets.only(
+                                                  left: 16, top: 8, bottom: 8),
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
+                                                children: <Widget>[
+                                                  Text(
+                                                    namaPaket ?? '',
+                                                    textAlign: TextAlign.left,
+                                                    style: TextStyle(
+                                                      decoration: TextDecoration
+                                                          .underline,
+                                                      decorationThickness: 2.0,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      fontSize: 22,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    orang ?? '',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white
+                                                          .withOpacity(1.0),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    waktu ?? '',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white
+                                                          .withOpacity(1.0),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    keuntungan1 ?? '',
+                                                    style: TextStyle(
+                                                      fontSize: 14,
+                                                      color: Colors.white
+                                                          .withOpacity(1.0),
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                          ),
+                                        ),
+                                        Padding(
+                                          padding: const EdgeInsets.only(
+                                              right: 16, top: 8),
+                                          child: Column(
+                                            mainAxisAlignment:
+                                                MainAxisAlignment.center,
+                                            crossAxisAlignment:
+                                                CrossAxisAlignment.end,
+                                            children: <Widget>[
+                                              Text(
+                                                'RP ${harga ?? ''}',
+                                                textAlign: TextAlign.left,
+                                                style: TextStyle(
+                                                  decoration:
+                                                      TextDecoration.underline,
+                                                  decorationThickness: 2.0,
+                                                  fontWeight: FontWeight.w600,
+                                                  fontSize: 21,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ],
+                          ),
+                        ),
+                      ),
+                    ),
+                  );
+                },
+              ),
+            ),
+        ],
+      ),
+      floatingActionButton: Padding(
+        padding: EdgeInsets.fromLTRB(0, 120, 0, 52),
+        child: Align(
+          alignment: Alignment.topRight,
+          child: FloatingActionButton(
+            onPressed: () {
+              // Navigasi ke halaman Obrolan
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                    builder: (context) => ChatScreen(
+                          receiverUserEmail: '',
+                          receiverUserID: '',
+                        )),
+              );
+            },
+            child: const Icon(Icons.chat),
+            backgroundColor:
+                const Color.fromARGB(255, 81, 85, 81).withOpacity(0.3),
+            elevation: 2,
+            shape:
+                RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
           ),
         ),
-        bottomNavigationBar:
-            BottomNavigation() // Use the BottomNavigation widget here
-        );
+      ),
+      bottomNavigationBar:
+          BottomNavigation(), // Use the BottomNavigation widget here
+    );
   }
 }

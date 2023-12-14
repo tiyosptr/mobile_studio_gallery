@@ -25,10 +25,17 @@ class SelectStudio extends StatefulWidget {
 }
 
 class _SelectStudioState extends State<SelectStudio> {
-  bool isPaymentUpfront = false;
-  bool isMandiriSelected = false;
+  bool isPaymentUpfront = true;
+  bool isMandiriSelected = true;
   bool isBCASelected = false;
-  String selectedBank = '';
+  String selectedBank = 'Mandiri\n10900********';
+
+  @override
+  void initState() {
+    super.initState();
+    // Set the initial value for the radio button
+    selectedBank = 'Mandiri\n10900********';
+  }
 
   void _showWarning(BuildContext context, String message) {
     ScaffoldMessenger.of(context).showSnackBar(
@@ -53,15 +60,14 @@ class _SelectStudioState extends State<SelectStudio> {
     Map<String, dynamic> bookingData = {
       'nama_paket': widget.paket['nama_paket'],
       'jam': widget.selectedTime,
-      'status': 'DiBooking',
       'tanggal': widget.selectedDate,
       'studio_dipilih': 'Studio ${widget.selectedStudioIndex + 1}',
       'metode_pembayaran': isPaymentUpfront
           ? 'Pembayaran didepan/lunas'
           : 'Transfer bank', // You can customize this logic
-      'status_pembayaran': isPaymentUpfront ? 'Lunas' : 'Belum lunas',
+      'status_pembayaran': isPaymentUpfront ? 'Belum lunas' : 'Lunas',
       'harga':
-          isPaymentUpfront ? widget.paket['harga'] ~/ 2 : widget.paket['harga'],
+          isPaymentUpfront ? widget.paket['harga'] ~/ 2 : widget.paket['harga']
       // Add other attributes as needed
     };
 
@@ -73,8 +79,8 @@ class _SelectStudioState extends State<SelectStudio> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Booking Successful'),
-          content: Text('Your booking has been successfully recorded.'),
+          title: Text('Sukses'),
+          content: Text('Berhasil Dipesan'),
           actions: <Widget>[
             TextButton(
               onPressed: () {
@@ -93,6 +99,9 @@ class _SelectStudioState extends State<SelectStudio> {
                           ? widget.paket['harga'] / 2
                           : widget.paket['harga'].toDouble(),
                       selectedBank: selectedBank,
+                      paketData: {},
+                      pemesananData: {},
+                      docId: '',
                     ),
                   ),
                 );
@@ -111,193 +120,194 @@ class _SelectStudioState extends State<SelectStudio> {
         debugShowCheckedModeBanner: false,
         home: Scaffold(
           backgroundColor: Colors.white,
-          body: Padding(
-            padding: const EdgeInsets.all(10.0),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    IconButton(
-                      icon: Icon(Icons.arrow_back, color: Colors.black87),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                ),
-                Text(
-                  'Kesimpulan',
-                  style: GoogleFonts.roboto(
-                    textStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w700),
+          body: SingleChildScrollView(
+            child: Padding(
+              padding: const EdgeInsets.all(10.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  SizedBox(height: 10),
+                  Row(
+                    children: [
+                      IconButton(
+                        icon: Icon(Icons.arrow_back, color: Colors.black87),
+                        onPressed: () {
+                          Navigator.pop(context);
+                        },
+                      ),
+                    ],
                   ),
-                ),
-                SizedBox(height: 10),
-                Center(
-                  child: Text(
-                    widget.paket['nama_paket'], // Display the selected package
-                    style: TextStyle(
-                        color: Colors.black,
-                        fontSize: 25,
-                        fontWeight: FontWeight.bold),
-                    textAlign: TextAlign.center,
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Studio yang dipilih: Studio ${widget.selectedStudioIndex + 1}', // Display the selected studio
-                  style: GoogleFonts.roboto(
-                    textStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 18.0,
-                        fontWeight: FontWeight.w700),
-                  ),
-                ),
-                SizedBox(height: 10),
-                Container(
-                  width: 400,
-                  height: 200,
-                  child: Image.asset(
-                    'images/studio${widget.selectedStudioIndex + 1}.png', // Assuming images are named studio1.png, studio2.png, etc.
-                    fit: BoxFit.cover,
-                  ),
-                ),
-                SizedBox(height: 20),
-                Text(
-                  'Jadwal',
-                  style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 19,
-                      fontWeight: FontWeight.w700),
-                  textAlign: TextAlign.left,
-                ),
-                SizedBox(height: 5),
-                Text(
-                  '${DateFormat('dd MMMM yyyy').format(DateFormat('dd-MM-yyyy').parse(widget.selectedDate))} - ${widget.selectedTime}',
-                  style: GoogleFonts.roboto(
-                    textStyle: TextStyle(
-                        color: Colors.black,
-                        fontSize: 16.0,
-                        fontWeight: FontWeight.w700),
-                  ),
-                ),
-                SizedBox(height: 20),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Pembayaran Didepan\n ${isPaymentUpfront ? 'Rp.${widget.paket['harga'] ~/ 2}' : 'Rp.${widget.paket['harga']}'}',
-                            style: TextStyle(
-                              color: isPaymentUpfront
-                                  ? Colors.black
-                                  : Colors.black54,
-                              fontSize: 17,
-                            ),
-                            textAlign: TextAlign.left,
-                          ),
-                        ),
-                        Container(
-                          width:
-                              50.0, // Sesuaikan lebar Container sesuai kebutuhan
-                          height:
-                              15.0, // Sesuaikan tinggi Container sesuai kebutuhan
-                          decoration: BoxDecoration(
-                            borderRadius: BorderRadius.circular(2.0),
-                            border: Border.all(color: Colors.white, width: 2.0),
-                          ),
-                          child: Checkbox(
-                            value: isPaymentUpfront,
-                            onChanged: (value) {
-                              setState(() {
-                                isPaymentUpfront = value!;
-                                // Uncheck both Mandiri and BCA when Pembayaran Didepan is selected
-                                if (isPaymentUpfront) {
-                                  selectedBank = '';
-                                }
-                              });
-                            },
-                            checkColor: Colors.white,
-                            activeColor: Colors.blue,
-                            materialTapTargetSize:
-                                MaterialTapTargetSize.shrinkWrap,
-                            visualDensity: VisualDensity.compact,
-                          ),
-                        ),
-                      ],
-                    ),
-                    SizedBox(height: 20),
-                    Text(
-                      'Transfer ke bank',
-                      style: GoogleFonts.roboto(
-                          textStyle:
-                              TextStyle(color: Colors.black, fontSize: 19.0),
+                  Text(
+                    'Kesimpulan',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18.0,
                           fontWeight: FontWeight.w700),
                     ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'Mandiri 10900********',
-                            style: TextStyle(
-                              color: selectedBank == 'Mandiri 10900********'
-                                  ? Colors.black
-                                  : Colors.black54,
-                              fontSize: 16,
+                  ),
+                  SizedBox(height: 10),
+                  Center(
+                    child: Text(
+                      widget
+                          .paket['nama_paket'], // Display the selected package
+                      style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 25,
+                          fontWeight: FontWeight.bold),
+                      textAlign: TextAlign.center,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Studio yang dipilih: Studio ${widget.selectedStudioIndex + 1}', // Display the selected studio
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18.0,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  SizedBox(height: 10),
+                  Container(
+                    width: 400,
+                    height: 200,
+                    child: Image.asset(
+                      'images/studio${widget.selectedStudioIndex + 1}.png', // Assuming images are named studio1.png, studio2.png, etc.
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Text(
+                    'Jadwal',
+                    style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 19,
+                        fontWeight: FontWeight.w700),
+                    textAlign: TextAlign.left,
+                  ),
+                  SizedBox(height: 5),
+                  Text(
+                    '${DateFormat('dd MMMM yyyy').format(DateFormat('dd-MM-yyyy').parse(widget.selectedDate))} - ${widget.selectedTime}',
+                    style: GoogleFonts.roboto(
+                      textStyle: TextStyle(
+                          color: Colors.black,
+                          fontSize: 16.0,
+                          fontWeight: FontWeight.w700),
+                    ),
+                  ),
+                  SizedBox(height: 20),
+                  Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Pembayaran Didepan\n ${isPaymentUpfront ? 'Rp.${widget.paket['harga'] ~/ 2}' : 'Rp.${widget.paket['harga']}'}',
+                              style: TextStyle(
+                                color: isPaymentUpfront
+                                    ? Colors.black
+                                    : Colors.black54,
+                                fontSize: 17,
+                              ),
+                              textAlign: TextAlign.left,
                             ),
                           ),
-                        ),
-                        Radio<String>(
-                          value: 'Mandiri 10900********',
-                          groupValue: selectedBank,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedBank = value!;
-                              // Uncheck Pembayaran Didepan when Mandiri is selected
-                              isPaymentUpfront = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                      children: [
-                        Expanded(
-                          child: Text(
-                            'BCA 21*********',
-                            style: TextStyle(
-                              color: selectedBank == 'BCA 21*********'
-                                  ? Colors.black
-                                  : Colors.black54,
-                              fontSize: 16,
+                          Container(
+                            width:
+                                50.0, // Sesuaikan lebar Container sesuai kebutuhan
+                            height:
+                                15.0, // Sesuaikan tinggi Container sesuai kebutuhan
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(2.0),
+                              border:
+                                  Border.all(color: Colors.white, width: 2.0),
+                            ),
+                            child: Checkbox(
+                              value: isPaymentUpfront,
+                              onChanged: (value) {
+                                setState(() {
+                                  isPaymentUpfront = value!;
+                                  // Uncheck both Mandiri and BCA when Pembayaran Didepan is selected
+                                });
+                              },
+                              checkColor: Colors.white,
+                              activeColor: Colors.blue,
+                              materialTapTargetSize:
+                                  MaterialTapTargetSize.shrinkWrap,
+                              visualDensity: VisualDensity.compact,
                             ),
                           ),
-                        ),
-                        Radio<String>(
-                          value: 'BCA 21*********',
-                          groupValue: selectedBank,
-                          onChanged: (value) {
-                            setState(() {
-                              selectedBank = value!;
-                              // Uncheck Pembayaran Didepan when BCA is selected
-                              isPaymentUpfront = false;
-                            });
-                          },
-                        ),
-                      ],
-                    ),
-                  ],
-                ),
-                SizedBox(height: 20),
-              ],
+                        ],
+                      ),
+                      SizedBox(height: 20),
+                      Text(
+                        'Transfer ke bank',
+                        style: GoogleFonts.roboto(
+                            textStyle:
+                                TextStyle(color: Colors.black, fontSize: 19.0),
+                            fontWeight: FontWeight.w700),
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'Mandiri\n10900********',
+                              style: TextStyle(
+                                color: selectedBank == 'Mandiri\n10900********'
+                                    ? Colors.black
+                                    : Colors.black54,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Radio<String>(
+                            value: 'Mandiri\n10900********',
+                            groupValue:
+                                selectedBank, // Set the initial value here
+                            onChanged: (value) {
+                              setState(() {
+                                selectedBank = value!;
+                                // Uncheck Pembayaran Didepan when Mandiri is selected
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              'BCA\n21*********',
+                              style: TextStyle(
+                                color: selectedBank == 'BCA\n21*********'
+                                    ? Colors.black
+                                    : Colors.black54,
+                                fontSize: 16,
+                              ),
+                            ),
+                          ),
+                          Radio<String>(
+                            value: 'BCA\n21*********',
+                            groupValue: selectedBank,
+                            onChanged: (value) {
+                              setState(() {
+                                selectedBank = value!;
+                                // Uncheck Pembayaran Didepan when BCA is selected
+                              });
+                            },
+                          ),
+                        ],
+                      ),
+                    ],
+                  ),
+                  SizedBox(height: 20),
+                ],
+              ),
             ),
           ),
           bottomNavigationBar: Builder(
@@ -312,7 +322,26 @@ class _SelectStudioState extends State<SelectStudio> {
                     );
                   } else {
                     // Save booking details to Firestore
-                    _saveBookingToFirestore();
+                    //_saveBookingToFirestore();
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => PembayaranScreen(
+                          paket: widget.paket,
+                          docId: widget.docId,
+                          selectedStudioIndex: widget.selectedStudioIndex,
+                          selectedDate: widget.selectedDate,
+                          selectedTime: widget.selectedTime,
+                          upfrontPaymentSelected: isPaymentUpfront,
+                          totalHarga: isPaymentUpfront
+                              ? widget.paket['harga'] / 2
+                              : widget.paket['harga'].toDouble(),
+                          selectedBank: selectedBank,
+                          paketData: {},
+                          pemesananData: {},
+                        ),
+                      ),
+                    );
                   }
                 },
                 style: ElevatedButton.styleFrom(
@@ -340,7 +369,7 @@ class _SelectStudioState extends State<SelectStudio> {
                             width: 100.0,
                           ),
                           Text(
-                            '${isPaymentUpfront ? 'Rp.${widget.paket['harga'] ~/ 2}' : 'Rp.${widget.paket['harga']}'}',
+                            '${isPaymentUpfront ? 'Rp.${(widget.paket['harga'] ~/ 2).toString()}' : 'Rp.${widget.paket['harga'].toString()}'}',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16.0,

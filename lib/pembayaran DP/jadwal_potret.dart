@@ -1,18 +1,37 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-
-void main() {
-  runApp(JadwalPemotretan());
-}
+import 'package:intl/intl.dart';
 
 class JadwalPemotretan extends StatelessWidget {
+  final Map<String, dynamic> paket;
+  final int selectedStudioIndex;
+  final String selectedDate;
+  final String selectedTime;
+  final bool upfrontPaymentSelected;
+  final double totalHarga;
+  final String selectedBank;
+  final String orderCode;
+
+  JadwalPemotretan({
+    required this.paket,
+    required this.selectedStudioIndex,
+    required this.selectedDate,
+    required this.selectedTime,
+    required this.upfrontPaymentSelected,
+    required this.totalHarga,
+    required this.selectedBank,
+    required this.orderCode,
+  });
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       home: Scaffold(
         body: Stack(
           children: [
-            MyStepper(),
+            MyStepper(
+              selectedDate: selectedDate,
+              selectedTime: selectedTime,
+            ),
             Positioned(
               top: 0,
               left: 0,
@@ -35,6 +54,11 @@ class JadwalPemotretan extends StatelessWidget {
 }
 
 class MyStepper extends StatefulWidget {
+  final String selectedDate;
+  final String selectedTime;
+
+  MyStepper({required this.selectedDate, required this.selectedTime});
+
   @override
   _MyStepperState createState() => _MyStepperState();
 }
@@ -100,7 +124,9 @@ class _MyStepperState extends State<MyStepper> {
   Widget _buildStepContent(int step) {
     switch (step) {
       case 1:
-        return Step1();
+        return Step1(
+            selectedDate: widget.selectedDate,
+            selectedTime: widget.selectedTime);
       default:
         return Container();
     }
@@ -108,17 +134,34 @@ class _MyStepperState extends State<MyStepper> {
 }
 
 class Step1 extends StatelessWidget {
+  final String selectedDate;
+  final String selectedTime;
+
+  Step1({required this.selectedDate, required this.selectedTime});
+
   @override
   Widget build(BuildContext context) {
     return Column(
       children: [
-        KeteranganJadwalPemotretan(),
+        KeteranganJadwalPemotretan(
+            selectedDate: selectedDate, selectedTime: selectedTime),
       ],
     );
   }
 }
 
 class KeteranganJadwalPemotretan extends StatelessWidget {
+  final String selectedDate;
+  final String selectedTime;
+
+  KeteranganJadwalPemotretan(
+      {required this.selectedDate, required this.selectedTime});
+
+  String _formatDateString(String dateString) {
+    DateTime date = DateFormat('dd-MM-yyyy').parse(dateString);
+    return DateFormat('dd MMMM yyyy').format(date);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Column(
@@ -127,9 +170,10 @@ class KeteranganJadwalPemotretan extends StatelessWidget {
           'Keterangan Jadwal Pemotretan',
           style: GoogleFonts.roboto(
             textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 20.0,
-                fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontSize: 20.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         SizedBox(height: 200),
@@ -137,18 +181,20 @@ class KeteranganJadwalPemotretan extends StatelessWidget {
           'Jadwal Pemotretan',
           style: GoogleFonts.roboto(
             textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 18.0,
-                fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontSize: 18.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         Text(
-          '13 September 17.00 - 17.30',
+          '${_formatDateString(selectedDate)} $selectedTime ',
           style: GoogleFonts.roboto(
             textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 16.0,
-                fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontSize: 16.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
         ),
         SizedBox(height: 10),
@@ -156,9 +202,10 @@ class KeteranganJadwalPemotretan extends StatelessWidget {
           'Kamu sudah bisa melakukan pemotretan Diharapkan untuk datang ke studio 10 menit sebelum pemotretan',
           style: GoogleFonts.roboto(
             textStyle: TextStyle(
-                color: Colors.black,
-                fontSize: 14.0,
-                fontWeight: FontWeight.bold),
+              color: Colors.black,
+              fontSize: 14.0,
+              fontWeight: FontWeight.bold,
+            ),
           ),
           textAlign: TextAlign.center,
         ),

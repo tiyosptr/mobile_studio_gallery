@@ -258,126 +258,59 @@ class _LoginPageState extends State<LoginPage> {
                           ),
                         ),
                       // Pesan error jika user salah dalam melakukan input data start end
-                      Container(
-                          margin: const EdgeInsets.symmetric(
-                              horizontal: 10.0, vertical: 30.0),
-                          child: ElevatedButton(
-                            onPressed: () async {
-                              await signInWithGoogle();
-                            },
-                            style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.white),
-                              shape: MaterialStateProperty.all<
-                                  RoundedRectangleBorder>(
-                                RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(200.0),
-                                ),
-                              ),
-                            ),
-                            child: SizedBox(
-                              height: 45.0,
-                              width: double.infinity,
-                              child: Center(
-                                child: Row(
-                                  mainAxisAlignment: MainAxisAlignment.center,
-                                  children: [
-                                    Image.asset(
-                                      'images/google.jpg',
-                                      height: 24,
-                                      width: 24,
-                                    ),
-                                    SizedBox(width: 10.0),
-                                    Text(
-                                      'Sign In with Google',
-                                      style: TextStyle(
-                                        color: Colors.black,
-                                        fontSize: 15.0,
-                                        fontWeight: FontWeight.bold,
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                              ),
-                            ),
-                          ))
                     ])),
-                     Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  SizedBox(height: 50.0), // Tambahkan spasi di sini
-                  Text(
-                    "Belum punya akun? ",
-                    style: TextStyle(
-                      color: Colors.black,
-                      fontSize: 15.0,
-                    ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).push(
-                        PageRouteBuilder(
-                          pageBuilder:
-                              (context, animation, secondaryAnimation) {
-                            return RegistrationPage2(); // Gantilah dengan halaman yang ingin Anda tampilkan saat daftar
-                          },
-                          transitionsBuilder:
-                              (context, animation, secondaryAnimation, child) {
-                            const begin =
-                                Offset(7.0, 0.0); // Mulai dari kanan ke kiri
-                            const end = Offset.zero; // Berakhir di posisi awal
-                            const curve = Curves.easeOutCubic; // Kurva animasi
-                            var tween = Tween(begin: begin, end: end)
-                                .chain(CurveTween(curve: curve));
-                            var offsetAnimation = animation.drive(tween);
-                            return SlideTransition(
-                              position: offsetAnimation,
-                              child:
-                                  child, // Halaman yang akan ditampilkan saat daftar
-                            );
-                          },
-                        ),
-                      );
-                    },
-                    child: Text(
-                      "Daftar",
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    SizedBox(height: 50.0), // Tambahkan spasi di sini
+                    Text(
+                      "Belum punya akun? ",
                       style: TextStyle(
-                        color: Colors.blue,
+                        color: Colors.black,
                         fontSize: 15.0,
-                        decoration: TextDecoration.underline,
                       ),
                     ),
-                  )
-                ],
-              ),
-                // logout start
-                ElevatedButton(
-                  onPressed: () async {
-                    await signOutFromGoogle();
-                    // Panggil fungsi logout saat tombol keluar ditekan
-                  },
-                  style: ButtonStyle(
-                    backgroundColor:
-                        MaterialStateProperty.all<Color>(Colors.red),
-                    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                      RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(200.0),
-                      ),
-                    ),
-                  ),
-                  child: const SizedBox(
-                    height: 45.0,
-                    width: double.infinity,
-                    child: Center(
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).push(
+                          PageRouteBuilder(
+                            pageBuilder:
+                                (context, animation, secondaryAnimation) {
+                              return RegistrationPage2(); // Gantilah dengan halaman yang ingin Anda tampilkan saat daftar
+                            },
+                            transitionsBuilder: (context, animation,
+                                secondaryAnimation, child) {
+                              const begin =
+                                  Offset(7.0, 0.0); // Mulai dari kanan ke kiri
+                              const end =
+                                  Offset.zero; // Berakhir di posisi awal
+                              const curve =
+                                  Curves.easeOutCubic; // Kurva animasi
+                              var tween = Tween(begin: begin, end: end)
+                                  .chain(CurveTween(curve: curve));
+                              var offsetAnimation = animation.drive(tween);
+                              return SlideTransition(
+                                position: offsetAnimation,
+                                child:
+                                    child, // Halaman yang akan ditampilkan saat daftar
+                              );
+                            },
+                          ),
+                        );
+                      },
                       child: Text(
-                        'Logout',
+                        "Daftar",
                         style: TextStyle(
-                          color: Colors.white,
+                          color: Colors.blue,
+                          fontSize: 15.0,
+                          decoration: TextDecoration.underline,
                         ),
                       ),
-                    ),
-                  ),
-                ), //logout end
+                    )
+                  ],
+                ),
+                // logout start
+                //logout end
               ],
             ),
           ),

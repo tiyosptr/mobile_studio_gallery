@@ -3,13 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 import 'package:mobile_studio_gallery/menu/memilih_jadwal.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-final List<String> studioImages = [
-  'images/studio1.png',
-  'images/studio2.png',
-  'images/studio3.png',
-  'images/studio4.png',
-];
+const String kPaketCollection = 'Paket';
+const String kBackgroundImagesField = 'background_images';
 
 class DetailHargaPage extends StatefulWidget {
   final Map<String, dynamic> paket;
@@ -25,24 +22,63 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
   int _selectedStudioIndex = 0;
   late String imageUrl = '';
   bool isLoading = false;
-  bool isButtonsVisible = false;
+  late DocumentSnapshot snapshot;
+  List<String> backgroundImages = []; // Use backgroundImages directly
 
   @override
   void initState() {
     super.initState();
     _loadImage();
+    _loadImageUrls();
+  }
+
+  Future<void> _loadImageUrls() async {
+    try {
+      FirebaseFirestore firestore = FirebaseFirestore.instance;
+      snapshot =
+          await firestore.collection(kPaketCollection).doc(widget.docId).get();
+
+      if (snapshot.exists) {
+        dynamic backgroundImagesData = snapshot[kBackgroundImagesField];
+
+        if (backgroundImagesData != null && backgroundImagesData is Map) {
+          backgroundImagesData.values.forEach((value) {
+            if (value is String && value.isNotEmpty) {
+              backgroundImages.add(value);
+            }
+          });
+        }
+
+        for (int i = 1; i <= 5; i++) {
+          String backgroundFieldName = 'background_image_$i';
+          String backgroundImage = snapshot[backgroundFieldName] ?? '';
+          if (backgroundImage.isNotEmpty) {
+            backgroundImages.add(backgroundImage);
+          }
+        }
+
+        setState(() {
+          // No need to use studioImages, directly use backgroundImages
+        });
+      } else {
+        print("Document does not exist");
+      }
+    } catch (e) {
+      print("Error loading image URLs: $e");
+      // Handle the error, e.g., show an error message to the user
+    }
   }
 
   void _loadImage() async {
     setState(() {
       isLoading = true;
     });
-    // Kode untuk memuat gambar
-    String imagePath = widget.paket['url_gambar'];
-    await Future.delayed(
-        Duration(seconds: 1)); // Simulasi waktu pemuatan gambar
+
+    // Simulate image loading delay
+    await Future.delayed(Duration(seconds: 1));
+
     setState(() {
-      imageUrl = imagePath;
+      imageUrl = widget.paket['url_gambar'];
       isLoading = false;
     });
   }
@@ -99,7 +135,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
               children: [
                 imageUrl.isNotEmpty
                     ? CarouselSlider(
-                        items: studioImages.map((imagePath) {
+                        items: backgroundImages.map((imagePath) {
                           return Image.network(
                             widget.paket['url_gambar'],
                             fit: BoxFit.cover,
@@ -181,7 +217,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                                   );
                                 },
                                 style: ElevatedButton.styleFrom(
-                                  primary: Color.fromARGB(255, 0, 0, 0),
+                                  primary: Color(0xFF232D3F),
                                   shape: RoundedRectangleBorder(
                                     borderRadius: BorderRadius.circular(5.0),
                                   ),
@@ -264,39 +300,37 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                       ),
                       Row(
                         children: [
-                          Icon(
-                            Icons.folder,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            widget.paket['keuntungan1'],
-                            style: GoogleFonts.roboto(
-                              textStyle: TextStyle(
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                  fontSize: 20.0),
-                            ),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              for (int i = 1;
+                                  i <= widget.paket['keuntungan'].length;
+                                  i++)
+                                Row(
+                                  children: [
+                                    Icon(
+                                      Icons.folder,
+                                      color: const Color.fromARGB(255, 0, 0, 0),
+                                    ),
+                                    SizedBox(width: 5),
+                                    Text(
+                                      widget.paket['keuntungan']
+                                          ['keuntungan_$i'],
+                                      style: GoogleFonts.roboto(
+                                        textStyle: TextStyle(
+                                          color: const Color.fromARGB(
+                                              255, 0, 0, 0),
+                                          fontSize: 20.0,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                            ],
                           ),
                         ],
                       ),
                       SizedBox(height: 10.0),
-                      Row(
-                        children: [
-                          Icon(
-                            Icons.picture_in_picture_sharp,
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                          ),
-                          SizedBox(width: 10),
-                          Text(
-                            widget.paket['keuntungan2'],
-                            style: GoogleFonts.roboto(
-                              textStyle: TextStyle(
-                                  color: const Color.fromARGB(255, 0, 0, 0),
-                                  fontSize: 20.0),
-                            ),
-                          ),
-                        ],
-                      ),
                       SizedBox(height: 25),
                       Text(
                         'Pilih Studio',
@@ -309,13 +343,21 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                       SizedBox(height: 10),
                       Row(
                         mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                        children: studioImages.asMap().entries.map((entry) {
+                        children: backgroundImages.asMap().entries.map((entry) {
                           final int index = entry.key;
                           final String imagePath = entry.value;
+                          final bool isSelected = _selectedStudioIndex == index;
+
                           return GestureDetector(
                             onTap: () {
                               setState(() {
-                                _selectedStudioIndex = index;
+                                if (isSelected) {
+                                  // Deselect jika sudah dipilih
+                                  _selectedStudioIndex = -1;
+                                } else {
+                                  // Pilih studio jika belum dipilih
+                                  _selectedStudioIndex = index;
+                                }
                               });
                             },
                             child: Container(
@@ -323,26 +365,77 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                               height: 80.0,
                               decoration: BoxDecoration(
                                 image: DecorationImage(
-                                  image: AssetImage(imagePath),
+                                  image: NetworkImage(imagePath),
                                   fit: BoxFit.cover,
                                 ),
                                 border: Border.all(
-                                  color: _selectedStudioIndex == index
+                                  color: isSelected
                                       ? Colors.blue
                                       : Colors.transparent,
                                   width: 2.0,
                                 ),
                                 borderRadius: BorderRadius.circular(10.0),
                               ),
+                              child: isSelected
+                                  ? Align(
+                                      alignment: Alignment.bottomRight,
+                                      child: Icon(
+                                        Icons.check_circle,
+                                        color: Colors.blue,
+                                        size: 24.0,
+                                      ),
+                                    )
+                                  : Container(),
                             ),
                           );
                         }).toList(),
                       ),
-                      Text('Studio Terpilih: ${_selectedStudioIndex + 1}',
-                          style: TextStyle(
-                            color: const Color.fromARGB(255, 0, 0, 0),
-                            fontSize: 16.0,
-                          ))
+                      Text(
+                        'Studio yg dipilih: Studio ${_selectedStudioIndex + 1}',
+                        style: TextStyle(
+                          color: const Color.fromARGB(255, 0, 0, 0),
+                          fontSize: 16.0,
+                        ),
+                      ),
+                      SizedBox(height: 20),
+                      Container(
+                        padding: EdgeInsets.symmetric(horizontal: 20),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => CalendarScreen(
+                                  paket: widget.paket,
+                                  docId: widget.docId,
+                                  studioIndex: _selectedStudioIndex,
+                                ),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            primary: Color(0xFF445256),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(10.0),
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsets.all(10.0),
+                            child: Row(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Text(
+                                  'Pesan Sekarang',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontSize: 16.0,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
                     ],
                   ),
                 ],
@@ -351,44 +444,6 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
           ),
         ],
       ),
-      bottomNavigationBar: Container(
-          padding: EdgeInsets.symmetric(horizontal: 20),
-          child: ElevatedButton(
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                  builder: (context) => CalendarScreen(
-                    paket: widget.paket,
-                    docId: widget.docId,
-                    studioIndex: _selectedStudioIndex,
-                  ),
-                ),
-              );
-            },
-            style: ElevatedButton.styleFrom(
-              primary: Color(0xFF445256),
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10.0),
-              ),
-            ),
-            child: Padding(
-              padding: EdgeInsets.all(2.0),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    'Pesan Sekarang',
-                    style: TextStyle(
-                      color: Colors.white,
-                      fontSize: 16.0,
-                    ),
-                  ),
-                ],
-              ),
-            ),
-          )),
-      // Existing code...
     );
   }
 }
