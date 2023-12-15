@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan_new.dart';
 import 'package:mobile_studio_gallery/user/data_pribadi.dart';
+import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan.dart';
 
 class BottomNavigation extends StatefulWidget {
   @override
@@ -9,7 +10,7 @@ class BottomNavigation extends StatefulWidget {
 }
 
 class _BottomNavigationState extends State<BottomNavigation> {
-  int currentIndex = 0;
+  int currentIndex = 1;
 
   final List<String> pageLabels = ['Home', 'Pesanan', 'Profile'];
 

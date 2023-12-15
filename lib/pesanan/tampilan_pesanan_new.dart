@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_studio_gallery/navigation/bar.dart';
+
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_studio_gallery/navigation/bar_pesanan.dart';
 
 void main() {
   runApp(PesananPage2());
@@ -92,6 +93,7 @@ class _PesananState extends State<Pesanan> {
           ],
         ),
         bottomNavigationBar: BottomNavigation(),
+        
       ),
     );
   }

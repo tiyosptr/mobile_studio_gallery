@@ -1,29 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+// import 'package:mobile_studio_gallery/navigation/bar.dart';
 import 'package:mobile_studio_gallery/user/ganti_data_bank.dart';
 import 'package:mobile_studio_gallery/user/ganti_email.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import 'package:mobile_studio_gallery/login/tampilan_awal.dart';
+import 'package:mobile_studio_gallery/navigation/bar_pribadi.dart';
 
-void main() async {
-  WidgetsFlutterBinding.ensureInitialized();
-  await Firebase.initializeApp();
-  runApp(DataPribadi());
-}
-
-class DataPribadi extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Data Pribadi',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        primarySwatch: Colors.blue,
-      ),
-      home: Tampilan(),
-    );
-  }
+void main() {
+  runApp(Tampilan());
 }
 
 class Tampilan extends StatelessWidget {
@@ -35,24 +18,13 @@ class Tampilan extends StatelessWidget {
         padding: EdgeInsets.all(16.0),
         child: TampilanDataPribadi(), // Menggunakan TampilanDataPribadi di sini
       ),
+             bottomNavigationBar: BottomNavigation(), // Use the BottomNavigation widget here
+
     );
   }
 }
 
 class TampilanDataPribadi extends StatelessWidget {
-  final FirebaseAuth _auth = FirebaseAuth.instance;
-
-  Future<void> signOutFromGoogle(BuildContext context) async {
-    await _auth.signOut();
-
-    // Setelah logout, arahkan pengguna ke tampilan awal
-    Navigator.pushAndRemoveUntil(
-      context,
-      MaterialPageRoute(builder: (context) => Awal()),
-      (Route<dynamic> route) => false,
-    );
-  }
-
   @override
   Widget build(BuildContext context) {
     return Container(
@@ -172,34 +144,9 @@ class TampilanDataPribadi extends StatelessWidget {
                   fontSize: 16.0,
                 ),
               )),
-          ElevatedButton(
-            onPressed: () async {
-              await signOutFromGoogle(context);
-              // Panggil fungsi logout saat tombol keluar ditekan
-            },
-            style: ButtonStyle(
-              backgroundColor: MaterialStateProperty.all<Color>(Colors.red),
-              shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-                RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(200.0),
-                ),
-              ),
-            ),
-            child: const SizedBox(
-              height: 45.0,
-              width: double.infinity,
-              child: Center(
-                child: Text(
-                  'Logout',
-                  style: TextStyle(
-                    color: Colors.white,
-                  ),
-                ),
-              ),
-            ),
-          ),
         ],
       ),
+      // bottomNavigationBar: BottomNavigation()
     );
   }
 }
