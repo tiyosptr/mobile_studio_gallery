@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
+import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan_new.dart';
 import 'package:mobile_studio_gallery/user/ganti_data_bank.dart';
 import 'package:mobile_studio_gallery/user/ganti_email.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:mobile_studio_gallery/login/tampilan_awal.dart';
+import 'package:mobile_studio_gallery/main.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -34,6 +37,61 @@ class Tampilan extends StatelessWidget {
       body: Container(
         padding: EdgeInsets.all(16.0),
         child: TampilanDataPribadi(), // Menggunakan TampilanDataPribadi di sini
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Pesanan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_pin),
+            label: 'Lokasi',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profil',
+          ),
+        ],
+        currentIndex: 3,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              // Navigate to Home
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PaketApp()),
+              );
+              break;
+            case 1:
+              // Navigate to Pesanan
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PesananPage2()),
+              );
+              break;
+            case 2:
+              // Navigate to Maps
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyMap()),
+              );
+              break;
+            case 3:
+              break;
+          }
+        },
+        backgroundColor: Color(0xFF232D3F), // Background color
+        selectedItemColor: Colors.white, // Selected item color
+        unselectedItemColor: Colors.grey, // Unselected item color
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+        elevation: 10, // Elevation
+        type: BottomNavigationBarType.fixed, // To ensure all labels are visible
       ),
     );
   }
@@ -172,6 +230,9 @@ class TampilanDataPribadi extends StatelessWidget {
                   fontSize: 16.0,
                 ),
               )),
+          SizedBox(
+            height: 155.0,
+          ),
           ElevatedButton(
             onPressed: () async {
               await signOutFromGoogle(context);

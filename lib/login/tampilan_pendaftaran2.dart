@@ -94,7 +94,8 @@ class _RegistrationPage extends State<RegistrationPage2> {
 
         String hashedPassword = hashPassword(_passwordController.text);
 
-        addUser(
+        // Call the addUser function after successful registration
+        await addUser(
           _namaLengkapController.text,
           _emailController.text,
           _namaPenggunaController.text,
@@ -105,6 +106,14 @@ class _RegistrationPage extends State<RegistrationPage2> {
         showSnackBar(
           context,
           "Pendaftaran berhasil!",
+        );
+
+        // Redirect to the next registration page
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RegistrationPage3(),
+          ),
         );
       } on FirebaseAuthException catch (e) {
         print("Error: $e");

@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import 'package:mobile_studio_gallery/navigation/bar.dart';
+import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:mobile_studio_gallery/main.dart';
+import 'package:mobile_studio_gallery/user/data_pribadi.dart';
 
 void main() {
   runApp(PesananPage2());
@@ -91,7 +93,62 @@ class _PesananState extends State<Pesanan> {
             OrderList(orders: ordersPaid),
           ],
         ),
-        bottomNavigationBar: BottomNavigation(),
+        bottomNavigationBar: BottomNavigationBar(
+          items: [
+            BottomNavigationBarItem(
+              icon: Icon(Icons.home),
+              label: 'Home',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.shopping_cart),
+              label: 'Pesanan',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.location_pin),
+              label: 'Lokasi',
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.person),
+              label: 'Profil',
+            ),
+          ],
+          currentIndex: 1,
+          onTap: (index) {
+            switch (index) {
+              case 0:
+                // Navigate to Home
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => PaketApp()),
+                );
+                break;
+              case 1:
+                break;
+              case 2:
+                // Navigate to Maps
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const MyMap()),
+                );
+                break;
+              case 3:
+                // Navigate to Maps
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => Tampilan()),
+                );
+                break;
+            }
+          },
+          backgroundColor: Color(0xFF232D3F), // Background color
+          selectedItemColor: Colors.white, // Selected item color
+          unselectedItemColor: Colors.grey, // Unselected item color
+          selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+          unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+          elevation: 10, // Elevation
+          type:
+              BottomNavigationBarType.fixed, // To ensure all labels are visible
+        ),
       ),
     );
   }

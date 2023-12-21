@@ -24,6 +24,7 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
   bool isLoading = false;
   late DocumentSnapshot snapshot;
   List<String> backgroundImages = []; // Use backgroundImages directly
+  Set<int> _selectedStudioIndices = Set();
 
   @override
   void initState() {
@@ -346,17 +347,18 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                         children: backgroundImages.asMap().entries.map((entry) {
                           final int index = entry.key;
                           final String imagePath = entry.value;
-                          final bool isSelected = _selectedStudioIndex == index;
+                          final bool isSelected =
+                              _selectedStudioIndices.contains(index);
 
                           return GestureDetector(
                             onTap: () {
                               setState(() {
                                 if (isSelected) {
                                   // Deselect jika sudah dipilih
-                                  _selectedStudioIndex = -1;
+                                  _selectedStudioIndices.remove(index);
                                 } else {
                                   // Pilih studio jika belum dipilih
-                                  _selectedStudioIndex = index;
+                                  _selectedStudioIndices.add(index);
                                 }
                               });
                             },
@@ -391,7 +393,9 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                         }).toList(),
                       ),
                       Text(
-                        'Studio yg dipilih: Studio ${_selectedStudioIndex + 1}',
+                        _selectedStudioIndices.isEmpty
+                            ? 'Belum ada studio yang dipilih'
+                            : 'Studio yang dipilih: ${_selectedStudioIndices.map((index) => 'Studio ${index + 1}').join(', ')}',
                         style: TextStyle(
                           color: const Color.fromARGB(255, 0, 0, 0),
                           fontSize: 16.0,
@@ -402,16 +406,27 @@ class _DetailHargaPageState extends State<DetailHargaPage> {
                         padding: EdgeInsets.symmetric(horizontal: 20),
                         child: ElevatedButton(
                           onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => CalendarScreen(
-                                  paket: widget.paket,
-                                  docId: widget.docId,
-                                  studioIndex: _selectedStudioIndex,
+                            if (_selectedStudioIndices.isNotEmpty) {
+                              // Studio yang dipilih tersedia, lanjutkan ke layar berikutnya
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => CalendarScreen(
+                                    paket: widget.paket,
+                                    docId: widget.docId,
+                                    studioIndex: _selectedStudioIndex,
+                                  ),
                                 ),
-                              ),
-                            );
+                              );
+                            } else {
+                              // Tidak ada studio yang dipilih, beri informasi atau berikan feedback
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(
+                                      'Pilih setidaknya satu studio untuk melanjutkan'),
+                                ),
+                              );
+                            }
                           },
                           style: ElevatedButton.styleFrom(
                             primary: Color(0xFF445256),

@@ -369,7 +369,7 @@ class _SelectStudioState extends State<SelectStudio> {
                             width: 100.0,
                           ),
                           Text(
-                            '${isPaymentUpfront ? 'Rp.${(widget.paket['harga'] ~/ 2).toString()}' : 'Rp.${widget.paket['harga'].toString()}'}',
+                            '${isPaymentUpfront ? 'Rp.${widget.paket['harga'] ~/ 2}' : 'Rp.${widget.paket['harga']}'}',
                             style: TextStyle(
                               color: Colors.white,
                               fontSize: 16.0,

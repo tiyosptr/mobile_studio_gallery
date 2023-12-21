@@ -17,24 +17,15 @@ import 'package:flutter/foundation.dart'
 class DefaultFirebaseOptions {
   static FirebaseOptions get currentPlatform {
     if (kIsWeb) {
-      throw UnsupportedError(
-        'DefaultFirebaseOptions have not been configured for web - '
-        'you can reconfigure this by running the FlutterFire CLI again.',
-      );
+      return web;
     }
     switch (defaultTargetPlatform) {
       case TargetPlatform.android:
         return android;
       case TargetPlatform.iOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for ios - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return ios;
       case TargetPlatform.macOS:
-        throw UnsupportedError(
-          'DefaultFirebaseOptions have not been configured for macos - '
-          'you can reconfigure this by running the FlutterFire CLI again.',
-        );
+        return macos;
       case TargetPlatform.windows:
         throw UnsupportedError(
           'DefaultFirebaseOptions have not been configured for windows - '
@@ -52,12 +43,47 @@ class DefaultFirebaseOptions {
     }
   }
 
+  static const FirebaseOptions web = FirebaseOptions(
+    apiKey: 'AIzaSyCotdyaZIz1nHXgLqPWSIX8lt2erKeR8Xc',
+    appId: '1:949939380299:web:09274ad31ff7e91c3d2dce',
+    messagingSenderId: '949939380299',
+    projectId: 'mollery-63499',
+    authDomain: 'mollery-63499.firebaseapp.com',
+    databaseURL: 'https://mollery-63499-default-rtdb.firebaseio.com',
+    storageBucket: 'mollery-63499.appspot.com',
+    measurementId: 'G-L5880BNR05',
+  );
+
   static const FirebaseOptions android = FirebaseOptions(
-    apiKey: 'AIzaSyBst6PWRz4vKZCC48eceRUZKQYSkGRqels',
+    apiKey: 'AIzaSyCTiUxtHJF9KPxDP1-fnpnyxzhJg93ELq4',
     appId: '1:949939380299:android:026c97da4b0ddf5d3d2dce',
     messagingSenderId: '949939380299',
     projectId: 'mollery-63499',
     databaseURL: 'https://mollery-63499-default-rtdb.firebaseio.com',
     storageBucket: 'mollery-63499.appspot.com',
+  );
+
+  static const FirebaseOptions ios = FirebaseOptions(
+    apiKey: 'AIzaSyAmeiV4qx6GDYT1DnnvUbwQc5aYB8_R6mI',
+    appId: '1:949939380299:ios:132e39761ff7b70d3d2dce',
+    messagingSenderId: '949939380299',
+    projectId: 'mollery-63499',
+    databaseURL: 'https://mollery-63499-default-rtdb.firebaseio.com',
+    storageBucket: 'mollery-63499.appspot.com',
+    androidClientId: '949939380299-1h2dd287fe3bcgt2971cprvr3n1m3lpu.apps.googleusercontent.com',
+    iosClientId: '949939380299-glgam5e8kdtp5aqi9jj76v39ika1mgak.apps.googleusercontent.com',
+    iosBundleId: 'com.example.mobileStudioGallery',
+  );
+
+  static const FirebaseOptions macos = FirebaseOptions(
+    apiKey: 'AIzaSyAmeiV4qx6GDYT1DnnvUbwQc5aYB8_R6mI',
+    appId: '1:949939380299:ios:7db2a58693dd37793d2dce',
+    messagingSenderId: '949939380299',
+    projectId: 'mollery-63499',
+    databaseURL: 'https://mollery-63499-default-rtdb.firebaseio.com',
+    storageBucket: 'mollery-63499.appspot.com',
+    androidClientId: '949939380299-1h2dd287fe3bcgt2971cprvr3n1m3lpu.apps.googleusercontent.com',
+    iosClientId: '949939380299-pvpokf3fi5u5mcdf8e9tf66timg338ni.apps.googleusercontent.com',
+    iosBundleId: 'com.example.mobileStudioGallery.RunnerTests',
   );
 }

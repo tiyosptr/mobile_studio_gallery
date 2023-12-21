@@ -3,10 +3,11 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:mobile_studio_gallery/chat/tampilan_chat.dart';
 import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:mobile_studio_gallery/navigation/bar.dart';
+import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan_new.dart';
+import 'package:mobile_studio_gallery/user/data_pribadi.dart';
+import 'package:mobile_studio_gallery/main.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -36,32 +37,12 @@ class _HomePageState extends State<HomePage> {
   late QuerySnapshot querySnapshot; // Tambahkan variabel ini
   bool isLoading = true; // Tambahkan variabel isLoading
   bool showTambahDataButton = false;
-  late User _currentUser;
 
   @override
   void initState() {
     super.initState();
-    if (FirebaseAuth.instance.currentUser != null) {
-      _currentUser = FirebaseAuth.instance.currentUser!;
-    } else {
-      // Handle the case where the user is not authenticated
-      // You can display a login screen or handle it as needed
-    }
     paketList = [];
     getPaketList();
-  }
-
-  Future<DocumentSnapshot> getUserData() async {
-    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-        .collection('users')
-        .where('email', isEqualTo: _currentUser.email)
-        .get();
-
-    if (querySnapshot.docs.isNotEmpty) {
-      return querySnapshot.docs.first;
-    } else {
-      return FirebaseFirestore.instance.collection('users').doc().get();
-    }
   }
 
   void getPaketList() {
@@ -192,34 +173,21 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   top: 80.0,
                   left: 20.0,
-                  child: FutureBuilder<DocumentSnapshot>(
-                    future: getUserData(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return CircularProgressIndicator();
-                      } else if (snapshot.hasError) {
-                        return Text('Error: ${snapshot.error}');
-                      } else {
-                        String userName =
-                            snapshot.data?.get('nama_pengguna') ?? 'User';
-                        return Text(
-                          userName,
-                          style: GoogleFonts.poppins(
-                            textStyle: TextStyle(
-                              color: Colors.white,
-                              fontSize: 20.0,
-                              shadows: [
-                                Shadow(
-                                  blurRadius: 4.0,
-                                  color: Colors.black,
-                                  offset: Offset(2.0, 2.0),
-                                ),
-                              ],
-                            ),
+                  child: Text(
+                    'User',
+                    style: GoogleFonts.poppins(
+                      textStyle: TextStyle(
+                        color: Colors.white,
+                        fontSize: 20.0,
+                        shadows: [
+                          Shadow(
+                            blurRadius: 4.0,
+                            color: Colors.black,
+                            offset: Offset(2.0, 2.0),
                           ),
-                        );
-                      }
-                    },
+                        ],
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -280,9 +248,9 @@ class _HomePageState extends State<HomePage> {
                               const BorderRadius.all(Radius.circular(16.0)),
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.6),
+                              color: Colors.grey.withOpacity(0.9),
                               offset: const Offset(4, 4),
-                              blurRadius: 16,
+                              blurRadius: 22,
                             ),
                           ],
                         ),
@@ -300,7 +268,7 @@ class _HomePageState extends State<HomePage> {
                                     height: 150.0,
                                   ),
                                   Container(
-                                    color: Colors.black,
+                                    color: Color(0xFF232D3F),
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -425,8 +393,61 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
       ),
-      bottomNavigationBar:
-          BottomNavigation(), // Use the BottomNavigation widget here
+      bottomNavigationBar: BottomNavigationBar(
+        items: [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.shopping_cart),
+            label: 'Pesanan',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.location_on_outlined),
+            label: 'Lokasi',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profil',
+          ),
+        ],
+        currentIndex: 0,
+        onTap: (index) {
+          switch (index) {
+            case 0:
+              break;
+            case 1:
+              // Navigate to Pesanan
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => PesananPage2()),
+              );
+              break;
+            case 2:
+              //Navigate to Maps
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MyMap()),
+              );
+              break;
+            case 3:
+              // Navigate to Maps
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => Tampilan()),
+              );
+              break;
+          }
+        },
+        backgroundColor: Color(0xFF232D3F), // Background color
+        selectedItemColor: Colors.white, // Selected item color
+        unselectedItemColor: Colors.grey, // Unselected item color
+        selectedLabelStyle: TextStyle(fontWeight: FontWeight.bold),
+        unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
+        elevation: 10, // Elevation
+        type: BottomNavigationBarType.fixed, // To ensure all labels are visible
+      ),
     );
   }
 }

@@ -2,10 +2,9 @@ import 'dart:io';
 
 import 'package:flutter/material.dart';
 import 'dart:core';
-import 'package:file_picker/file_picker.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:intl/intl.dart';
-import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan.dart';
+import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan_new.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 
@@ -64,7 +63,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
 
       // Menyesuaikan nilai 'Metode Pembayaran' berdasarkan upfrontPaymentSelected
       String metodePembayaran =
-          widget.upfrontPaymentSelected ? 'Pembayaran DP' : 'Transfer bank';
+          widget.upfrontPaymentSelected ? 'Pembayaran DP' : 'Pembayaran Lunas';
 
       String statusPembayaran =
           widget.upfrontPaymentSelected ? 'Belum lunas' : 'Lunas';
@@ -104,7 +103,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         String namaFile =
             '${widget.paket['nama_paket']}_${DateFormat('yyyyMMdd_HHmmss').format(now)}.png';
 
-        Reference ref = storage.ref().child('/images').child(namaFile);
+        Reference ref = storage.ref().child('/').child(namaFile);
         UploadTask uploadTask = ref.putFile(
           _gambar!,
           SettableMetadata(contentType: 'image/png'), // Set tipe file
@@ -127,7 +126,7 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => PesananPage(),
+          builder: (context) => PesananPage2(),
         ),
       );
     } catch (error) {
@@ -231,8 +230,6 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
               SizedBox(height: 30),
               buildRow(
                   'Total Pembayaran', 'Rp ${widget.totalHarga.toString()}'),
-              SizedBox(height: 30),
-              buildRowWithIcon(Icons.timer, 'Batas Waktu Pembayaran 30 menit'),
               SizedBox(height: 30),
               buildText('Dimohon setelah melakukan pembayaran,'),
               buildText('dapat menambahkan screenshoot layar untuk verifikasi'),
@@ -372,18 +369,6 @@ class _PembayaranScreenState extends State<PembayaranScreen> {
         ),
         Text(
           displayedSubtitle,
-          style: TextStyle(color: Colors.black, fontSize: 16),
-        ),
-      ],
-    );
-  }
-
-  Widget buildRowWithIcon(IconData icon, String text) {
-    return Row(
-      children: [
-        Icon(icon, color: Colors.black),
-        Text(
-          text,
           style: TextStyle(color: Colors.black, fontSize: 16),
         ),
       ],
