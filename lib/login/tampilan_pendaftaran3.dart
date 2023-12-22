@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:mobile_studio_gallery/login/tampilan_pendaftaran1.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 
 void main() {
   runApp(const Pendaftaran3());
@@ -33,6 +36,34 @@ class _RegistrationPageState extends State<RegistrationPage3> {
     'Bank BCA',
     'Bank BRI'
   ]; // Ganti dengan daftar nama bank yang sesuai
+  TextEditingController _namaController = TextEditingController();
+  TextEditingController _noRekeningController = TextEditingController();
+
+  void _konfirmasi() async {
+    String nama = _namaController.text;
+    String noRekening = _noRekeningController.text;
+
+    if (nama.isNotEmpty && noRekening.isNotEmpty && selectedBank != null) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      DocumentSnapshot userDoc = await users.doc(uid).get();
+
+      await users.doc(uid).set({
+        'bank': {
+          'nama': nama,
+          'jenis': selectedBank,
+          'no_rekening': noRekening,
+        },
+      }, SetOptions(merge: true));
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) => HomePage(),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -56,6 +87,45 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                           MaterialPageRoute(
                               builder: (context) => const RegistrationPage1()));
                     },
+                  ),
+                  InkWell(
+                    onTap: () {
+                      Navigator.of(context).push(
+                        PageRouteBuilder(
+                          pageBuilder:
+                              (context, animation, secondaryAnimation) {
+                            return PaketApp(); // Gantilah dengan halaman yang ingin Anda tampilkan saat daftar
+                          },
+                          transitionsBuilder:
+                              (context, animation, secondaryAnimation, child) {
+                            const begin =
+                                Offset(7.0, 5.3); // Mulai dari kanan ke kiri
+                            const end = Offset.zero; // Berakhir di posisi awal
+                            const curve = Curves.easeOutCubic; // Kurva animasi
+                            var tween = Tween(begin: begin, end: end)
+                                .chain(CurveTween(curve: curve));
+                            var offsetAnimation = animation.drive(tween);
+                            return SlideTransition(
+                              position: offsetAnimation,
+                              child:
+                                  child, // Halaman yang akan ditampilkan saat daftar
+                            );
+                          },
+                        ),
+                      );
+                    },
+                    child: Align(
+                      alignment:
+                          Alignment.topRight, // Sesuaikan sesuai kebutuhan Anda
+                      child: Text(
+                        "Lewati",
+                        style: TextStyle(
+                          color: Colors.blue,
+                          fontSize: 15.0,
+                          // decoration: TextDecoration.underline,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),
@@ -100,13 +170,14 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                         const SizedBox(
                           height: 20.0,
                         ),
-                        const SizedBox(
+                        SizedBox(
                           width: 356.0,
                           height: 45.0,
                           child: TextField(
+                            controller: _namaController,
                             decoration: InputDecoration(
                               labelText:
-                                  'Masukkan Nama Lengkap', // Teks di dalam border
+                                  'Masukkan Nama', // Teks di dalam border
                               border: OutlineInputBorder(
                                 borderSide: BorderSide(),
                               ),
@@ -166,6 +237,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
                           width: 356.0,
                           height: 45.0,
                           child: TextField(
+                            controller: _noRekeningController,
                             keyboardType: TextInputType
                                 .number, // Hanya memperbolehkan input angka
                             inputFormatters: <TextInputFormatter>[
@@ -204,6 +276,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
         margin: const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
         child: ElevatedButton(
           onPressed: () {
+            _konfirmasi();
             // Tambahkan aksi yang ingin Anda lakukan saat tombol ditekan
           },
           style: ButtonStyle(
@@ -219,7 +292,7 @@ class _RegistrationPageState extends State<RegistrationPage3> {
             width: double.infinity,
             child: Center(
               child: Text(
-                'Buat Akun',
+                'Konfirmasi',
                 style: TextStyle(
                   color: Colors.white,
                 ),
@@ -231,4 +304,3 @@ class _RegistrationPageState extends State<RegistrationPage3> {
     );
   }
 }
-

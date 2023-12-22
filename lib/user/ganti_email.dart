@@ -1,11 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   runApp(GantiData());
 }
 
 class GantiData extends StatelessWidget {
+  final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _namaPenggunaController = TextEditingController();
+  final TextEditingController _namaLengkapController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
@@ -49,7 +55,7 @@ class GantiData extends StatelessWidget {
                     )),
                 SizedBox(height: 10),
                 TextFormField(
-                  initialValue: 'jhondhoe@gmail.com',
+                  controller: _emailController,
                   obscureText: false,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
@@ -66,7 +72,7 @@ class GantiData extends StatelessWidget {
                   ),
                 ),
                 SizedBox(height: 20),
-                Text('Ganti Nama Pengguna',
+                Text('Ganti Nama Lengkap',
                     style: GoogleFonts.roboto(
                       textStyle: TextStyle(
                           color: Colors.white,
@@ -76,7 +82,26 @@ class GantiData extends StatelessWidget {
                 SizedBox(height: 10),
 
                 TextFormField(
-                  initialValue: 'jhondhoe',
+                  controller: _namaLengkapController,
+                  obscureText: false,
+                  decoration: InputDecoration(
+                    fillColor: Colors.white,
+                    filled: true,
+                    enabledBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(),
+                    ),
+                    focusedBorder: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(15),
+                      borderSide: BorderSide(),
+                    ),
+                    labelText: 'Ganti Nama Pengguna',
+                  ),
+                ),
+                SizedBox(height: 20),
+
+                TextFormField(
+                  controller: _namaPenggunaController,
                   obscureText: false,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
@@ -151,9 +176,31 @@ class GantiData extends StatelessWidget {
                 Expanded(
                     child: SizedBox()), // Memberikan ruang ke tombol konfirmasi
                 ElevatedButton(
-                  onPressed: () {
+                  onPressed: () async {
                     // Aksi ketika tombol "Konfirmasi" di-klik
                     // Misalnya, validasi input dan simpan perubahan
+                    String newEmail = _emailController.text;
+                    String newNamaPengguna = _namaPenggunaController.text;
+                    String newNamaLengkap = _namaLengkapController.text;
+                    final uid = FirebaseAuth.instance.currentUser?.uid;
+
+                    await FirebaseFirestore.instance
+                        .collection('users')
+                        .doc(uid)
+                        .update({
+                      'email': newEmail,
+                      'nama_pengguna': newNamaPengguna,
+                      'nama_lengkap': newNamaLengkap,
+                    });
+
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(
+                        content: Text('Perubahan data berhasil disimpan.'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+
+                    Navigator.pop(context);
                   },
                   style: ElevatedButton.styleFrom(
                     primary: Color(0xFF445256), // Warna 445256

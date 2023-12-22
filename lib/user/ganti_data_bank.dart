@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 void main() {
   runApp(GantiDataBank());
@@ -13,6 +15,51 @@ class GantiDataBank extends StatefulWidget {
 class _GantiDataState extends State<GantiDataBank> {
   String? selectedBank;
   List<String> banks = ['Bank BNI', 'Bank MANDIRI', 'Bank BCA', 'Bank BRI'];
+  TextEditingController _namaController = TextEditingController();
+  TextEditingController _noRekeningController = TextEditingController();
+
+  void _konfirmasi() async {
+    String nama = _namaController.text;
+    String noRekening = _noRekeningController.text;
+
+    if (nama.isNotEmpty && noRekening.isNotEmpty && selectedBank != null) {
+      final uid = FirebaseAuth.instance.currentUser?.uid;
+
+      CollectionReference users =
+          FirebaseFirestore.instance.collection('users');
+      DocumentSnapshot userDoc = await users.doc(uid).get();
+
+      if (userDoc.exists) {
+        await users.doc(uid).update({
+          'bank.nama': nama,
+          'bank.jenis': selectedBank,
+          'bank.no_rekening': noRekening,
+        });
+      } else {
+        await users.doc(uid).set({
+          'bank': {
+            'nama': nama,
+            'jenis': selectedBank,
+            'no_rekening': noRekening,
+          },
+        }, SetOptions(merge: true));
+      }
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text("Data bank berhasil disimpan."),
+          duration: Duration(seconds: 2),
+        ),
+      );
+      Navigator.pop(context);
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Mohon lengkapi semua data'),
+          duration: Duration(seconds: 2),
+        ),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -57,6 +104,7 @@ class _GantiDataState extends State<GantiDataBank> {
                     )),
                 SizedBox(height: 10),
                 TextFormField(
+                  controller: _namaController,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
@@ -114,6 +162,7 @@ class _GantiDataState extends State<GantiDataBank> {
                           fontWeight: FontWeight.bold),
                     )),
                 TextFormField(
+                  controller: _noRekeningController,
                   decoration: InputDecoration(
                     fillColor: Colors.white,
                     filled: true,
@@ -133,6 +182,7 @@ class _GantiDataState extends State<GantiDataBank> {
                     child: SizedBox()), // Memberikan ruang ke tombol konfirmasi
                 ElevatedButton(
                   onPressed: () {
+                    _konfirmasi();
                     // Aksi ketika tombol "Konfirmasi" di-klik
                     // Misalnya, validasi input dan simpan perubahan
                   },

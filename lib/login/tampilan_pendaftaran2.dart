@@ -43,6 +43,18 @@ class _RegistrationPage extends State<RegistrationPage2> {
       TextEditingController();
 
   bool _isChecked = false;
+  bool _isError = false;
+  bool _isSuccess = false;
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            _isError ? Colors.red : (_isSuccess ? Colors.green : null),
+      ),
+    );
+  }
 
   bool validateFields() {
     if (_namaLengkapController.text.isEmpty ||
@@ -50,13 +62,20 @@ class _RegistrationPage extends State<RegistrationPage2> {
         _namaPenggunaController.text.isEmpty ||
         _passwordController.text.isEmpty ||
         _ulangiPasswordController.text.isEmpty) {
-      showSnackBar(context, "Semua kolom harus diisi");
+      _isError = true;
+      _showSnackBar(context, "Semua kolom harus diisi");
       return false;
     } else if (!isValidEmail(_emailController.text)) {
-      showSnackBar(context, "Masukkan alamat email yang valid");
+      _isError = true;
+      _showSnackBar(context, "Masukkan alamat email yang valid");
+      return false;
+    } else if (_passwordController.text.length < 8) {
+      _isError = true;
+      _showSnackBar(context, "Kata sandi harus minimal 8 karakter");
       return false;
     } else if (!passwordConfirmed()) {
-      showSnackBar(context, "Kata sandi tidak sesuai");
+      _isError = true;
+      _showSnackBar(context, "Kata sandi tidak sesuai");
       return false;
     }
     return true;
@@ -91,39 +110,32 @@ class _RegistrationPage extends State<RegistrationPage2> {
         );
 
         String uid = userCredential.user?.uid ?? "";
+        print("UID from Authentication: $uid");
 
         String hashedPassword = hashPassword(_passwordController.text);
 
-        // Call the addUser function after successful registration
-        await addUser(
+        addUser(
           _namaLengkapController.text,
           _emailController.text,
           _namaPenggunaController.text,
           hashedPassword,
           uid,
         );
-
-        showSnackBar(
+        _isSuccess = true;
+        _showSnackBar(
           context,
           "Pendaftaran berhasil!",
         );
-
-        // Redirect to the next registration page
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RegistrationPage3(),
-          ),
-        );
       } on FirebaseAuthException catch (e) {
         print("Error: $e");
-        showSnackBar(
+        _isError = true;
+        _showSnackBar(
           context,
           "Pendaftaran gagal. ${e.message}",
         );
       }
     } else {
-      showSnackBar(
+      _showSnackBar(
         context,
         "Pastikan Anda telah menyetujui Kebijakan Privasi dan Persyaratan Layanan.",
       );
@@ -139,7 +151,7 @@ class _RegistrationPage extends State<RegistrationPage2> {
   //nyimpan userdetail
   Future addUser(String namaLengkap, String email, String namaPengguna,
       String password, String uid) async {
-    await FirebaseFirestore.instance.collection('users').add({
+    await FirebaseFirestore.instance.collection('users').doc(uid).set({
       'nama_lengkap': namaLengkap,
       'email': email,
       'nama_pengguna': namaPengguna,
@@ -400,12 +412,21 @@ class _RegistrationPage extends State<RegistrationPage2> {
                 const EdgeInsets.symmetric(horizontal: 25.0, vertical: 20.0),
             child: ElevatedButton(
               onPressed: () async {
-                if (validateFields()) {
-                  await signUp();
-                  Navigator.push(
+                if (_isChecked) {
+                  if (validateFields()) {
+                    await signUp();
+                    _isError = false;
+                    _isSuccess = false;
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                          builder: (context) => RegistrationPage3()),
+                    );
+                  }
+                } else {
+                  showSnackBar(
                     context,
-                    MaterialPageRoute(
-                        builder: (context) => RegistrationPage3()),
+                    "Anda harus menyetujui Kebijakan Privasi dan Persyaratan Layanan.",
                   );
                 }
               },

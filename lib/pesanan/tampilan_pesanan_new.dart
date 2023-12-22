@@ -1,15 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-<<<<<<< HEAD
+
 import 'package:mobile_studio_gallery/menu/tampilan_utama.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_studio_gallery/main.dart';
 import 'package:mobile_studio_gallery/user/data_pribadi.dart';
-=======
 
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:mobile_studio_gallery/navigation/bar_pesanan.dart';
->>>>>>> fad5c421b4eb78dd7ac22d13fb20bf6d3b03945e
 
 void main() {
   runApp(PesananPage2());
@@ -99,7 +97,6 @@ class _PesananState extends State<Pesanan> {
             OrderList(orders: ordersPaid),
           ],
         ),
-<<<<<<< HEAD
         bottomNavigationBar: BottomNavigationBar(
           items: [
             BottomNavigationBarItem(
@@ -156,10 +153,6 @@ class _PesananState extends State<Pesanan> {
           type:
               BottomNavigationBarType.fixed, // To ensure all labels are visible
         ),
-=======
-        bottomNavigationBar: BottomNavigation(),
-        
->>>>>>> fad5c421b4eb78dd7ac22d13fb20bf6d3b03945e
       ),
     );
   }

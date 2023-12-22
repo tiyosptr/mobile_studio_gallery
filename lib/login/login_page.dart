@@ -42,6 +42,19 @@ class _LoginPageState extends State<LoginPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
 
+  bool _isError = false;
+  bool _isSuccess = false;
+
+  void _showSnackBar(BuildContext context, String message) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(
+        content: Text(message),
+        backgroundColor:
+            _isError ? Colors.red : (_isSuccess ? Colors.green : null),
+      ),
+    );
+  }
+
   final FirebaseAuth _auth = FirebaseAuth.instance;
   //signUplogic start
   Future<void> signUp() async {
@@ -57,8 +70,19 @@ class _LoginPageState extends State<LoginPage> {
     if (_emailController.text.isEmpty || _passwordController.text.isEmpty) {
       // Jika email atau kata sandi kosong, tampilkan pesan kesalahan.
       setState(() {
-        _showError = true;
+        _isError = true;
+        _showSnackBar(context, "Harap isi semua bidang");
       });
+      return;
+    }
+
+    if (_passwordController.text.length < 8) {
+      // Jika panjang kata sandi kurang dari 8 karakter, tampilkan pesan kesalahan.
+      setState(() {
+        _isError = true;
+        _passwordController.clear(); // Clear the password field
+      });
+      _showSnackBar(context, "Kata sandi harus minimal 8 karakter");
       return;
     }
 
@@ -71,7 +95,8 @@ class _LoginPageState extends State<LoginPage> {
       if (userCredential.user != null) {
         // Jika berhasil login, Anda dapat mengarahkan pengguna ke halaman berikutnya atau melakukan tindakan lainnya.
         print('User berhasil login');
-        showSnackBar(context, "Login berhasil");
+        _isSuccess = true;
+        _showSnackBar(context, "Login berhasil");
         // Arahkan pengguna ke halaman utama.
         Navigator.of(context).pushReplacement(
           MaterialPageRoute(

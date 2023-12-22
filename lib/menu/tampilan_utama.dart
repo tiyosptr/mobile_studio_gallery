@@ -5,9 +5,11 @@ import 'package:mobile_studio_gallery/chat/tampilan_chat.dart';
 import 'package:mobile_studio_gallery/menu/detailhargapage.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:mobile_studio_gallery/pesanan/tampilan_pesanan_new.dart';
 import 'package:mobile_studio_gallery/user/data_pribadi.dart';
 import 'package:mobile_studio_gallery/main.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -37,12 +39,32 @@ class _HomePageState extends State<HomePage> {
   late QuerySnapshot querySnapshot; // Tambahkan variabel ini
   bool isLoading = true; // Tambahkan variabel isLoading
   bool showTambahDataButton = false;
+  late User _currentUser;
 
   @override
   void initState() {
     super.initState();
+    if (FirebaseAuth.instance.currentUser != null) {
+      _currentUser = FirebaseAuth.instance.currentUser!;
+    } else {
+      // Handle the case where the user is not authenticated
+      // You can display a login screen or handle it as needed
+    }
     paketList = [];
     getPaketList();
+  }
+
+  Future<DocumentSnapshot> getUserData() async {
+    QuerySnapshot querySnapshot = await FirebaseFirestore.instance
+        .collection('users')
+        .where('email', isEqualTo: _currentUser.email)
+        .get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      return querySnapshot.docs.first;
+    } else {
+      return FirebaseFirestore.instance.collection('users').doc().get();
+    }
   }
 
   void getPaketList() {
@@ -87,6 +109,7 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final Uri whatsApp = Uri.parse('https://wa.me/+62895379126382');
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       body: Column(
@@ -173,21 +196,34 @@ class _HomePageState extends State<HomePage> {
                 Positioned(
                   top: 80.0,
                   left: 20.0,
-                  child: Text(
-                    'User',
-                    style: GoogleFonts.poppins(
-                      textStyle: TextStyle(
-                        color: Colors.white,
-                        fontSize: 20.0,
-                        shadows: [
-                          Shadow(
-                            blurRadius: 4.0,
-                            color: Colors.black,
-                            offset: Offset(2.0, 2.0),
+                  child: FutureBuilder<DocumentSnapshot>(
+                    future: getUserData(),
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return CircularProgressIndicator();
+                      } else if (snapshot.hasError) {
+                        return Text('Error: ${snapshot.error}');
+                      } else {
+                        String userName =
+                            snapshot.data?.get('nama_pengguna') ?? 'User';
+                        return Text(
+                          userName,
+                          style: GoogleFonts.poppins(
+                            textStyle: TextStyle(
+                              color: Colors.white,
+                              fontSize: 20.0,
+                              shadows: [
+                                Shadow(
+                                  blurRadius: 4.0,
+                                  color: Colors.black,
+                                  offset: Offset(2.0, 2.0),
+                                ),
+                              ],
+                            ),
                           ),
-                        ],
-                      ),
-                    ),
+                        );
+                      }
+                    },
                   ),
                 ),
               ],
@@ -248,9 +284,9 @@ class _HomePageState extends State<HomePage> {
                               const BorderRadius.all(Radius.circular(16.0)),
                           boxShadow: <BoxShadow>[
                             BoxShadow(
-                              color: Colors.grey.withOpacity(0.9),
+                              color: Colors.grey.withOpacity(0.6),
                               offset: const Offset(4, 4),
-                              blurRadius: 22,
+                              blurRadius: 16,
                             ),
                           ],
                         ),
@@ -268,7 +304,7 @@ class _HomePageState extends State<HomePage> {
                                     height: 150.0,
                                   ),
                                   Container(
-                                    color: Color(0xFF232D3F),
+                                    color: Colors.black,
                                     child: Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.center,
@@ -375,14 +411,7 @@ class _HomePageState extends State<HomePage> {
           child: FloatingActionButton(
             onPressed: () {
               // Navigasi ke halaman Obrolan
-              Navigator.push(
-                context,
-                MaterialPageRoute(
-                    builder: (context) => ChatScreen(
-                          receiverUserEmail: '',
-                          receiverUserID: '',
-                        )),
-              );
+              launchUrl(whatsApp);
             },
             child: const Icon(Icons.chat),
             backgroundColor:
@@ -447,7 +476,7 @@ class _HomePageState extends State<HomePage> {
         unselectedLabelStyle: TextStyle(fontWeight: FontWeight.normal),
         elevation: 10, // Elevation
         type: BottomNavigationBarType.fixed, // To ensure all labels are visible
-      ),
+      ), // Use the BottomNavigation widget here
     );
   }
 }
